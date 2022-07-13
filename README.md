@@ -1,6 +1,13 @@
 # discarbon-devcon-attendee-contract
 This the smart contract for the devcon attendees to buy carbon tokens and send them to a wallet.
 
+This smart contract has the following tasks:
+
+1. Receive/Get coins/tokens from attendee.
+2. Exchange for carbon token (NCT) on sushiswap.
+3. Forward carbon token to a preprogrammed wallet address.
+4. Store the attendee address and offset amount to issue a POAP.
+
 
 
 
