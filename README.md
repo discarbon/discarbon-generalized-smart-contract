@@ -11,9 +11,21 @@ This smart contract has the following tasks:
 
 ## How to get started
 
-Deploy the pooling contract with _
+Install all dependencies
 
-`npx hardhat run scripts/deploy_pooling.js`
+```npm install```
+
+copy the "env" file to ".env" and fill in the needed Keys.
+
+Fork the polygon mainnet
+
+```hh node```
+
+(need to have hardhat shorthand installed for this: ```npm i -g hardhat-shorthand```)
+
+Deploy the pooling contract with:
+
+`hh run scripts/deploy_pooling.js`
 
 
 ## hardhat sample project readme
