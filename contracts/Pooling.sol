@@ -9,7 +9,8 @@ pragma solidity ^0.8.9;
 import "hardhat/console.sol";
 
 contract Pooling {
-    mapping(address => uint256) public contributors;
+    mapping(address => uint256) public contributions;
+    address[] public contributorsAdresses;
 
     uint256 totalCarbonPooled = 0;
 
@@ -20,6 +21,10 @@ contract Pooling {
     function swapToCarbonToken() private {} // does the swap
     function forwardCarbonToken(uint256 CarbonAmount) private { // forwards the tokens to the poolingAddress
     totalCarbonPooled += CarbonAmount;
-    contributors[msg.sender] += CarbonAmount;
+    if (contributions[msg.sender] == 0) {
+        contributorsAdresses.push(msg.sender);
+    }
+    contributions[msg.sender] += CarbonAmount;
+
     }
 }
