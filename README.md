@@ -9,6 +9,11 @@ This smart contract has the following tasks:
 4. Store the attendee address and offset amount to issue a POAP.
 
 
+## How to get started
+
+Deploy the pooling contract with _
+
+`npx hardhat run scripts/deploy_pooling.js`
 
 
 ## hardhat sample project readme
