@@ -1,8 +1,8 @@
-const {time, loadFixture} = require("@nomicfoundation/hardhat-network-helpers");
+const { time, loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 
-const {constants, expectRevert} = require('@openzeppelin/test-helpers');
+const { constants, expectRevert } = require('@openzeppelin/test-helpers');
 
 describe("Pooling", function () {
   // We define a fixture to reuse the same setup in every test.
@@ -25,6 +25,32 @@ describe("Pooling", function () {
       // console.log(JSON.stringify(pooling));
 
       expect(pooling.address != constants.zeroAddress);
+    });
+  });
+  describe("Initial transfer", function () {
+    it("Should record the address and pooled amount", async function () {
+      const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
+
+      const ethToSend1 = ethers.utils.parseEther("0.001");
+      const ethToSend2 = ethers.utils.parseEther("0.00356");
+
+      // Contribute from first address
+      await pooling.exchangeCoinToCarbonToken({ value: ethToSend1 });
+      let recordedAddress = await pooling.contributorsAddresses(0);
+      expect(recordedAddress).to.equal(owner.address);
+      let contribution1 = await pooling.contributions(owner.address);
+      expect(contribution1).to.equal(ethToSend1);
+      let totalCarbonPooled = await pooling.totalCarbonPooled();
+      expect(totalCarbonPooled).to.equal(contribution1);
+
+      // Contribute from second address
+      await pooling.connect(otherAccount).exchangeCoinToCarbonToken({ value: ethToSend2 });
+      expect(await pooling.contributorsAddresses(1)).to.equal(otherAccount.address);
+      let contribution2 = await pooling.contributions(otherAccount.address);
+      expect(contribution2).to.equal(ethToSend2);
+
+      totalCarbonPooled = await pooling.totalCarbonPooled();
+      expect(totalCarbonPooled).to.equal(ethToSend1.add(ethToSend2));
     });
   });
 });

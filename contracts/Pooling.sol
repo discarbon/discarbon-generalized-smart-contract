@@ -12,13 +12,20 @@ contract Pooling {
     mapping(address => uint256) public contributions;
     address[] public contributorsAddresses;
 
-    uint256 totalCarbonPooled = 0;
+    uint256 public totalCarbonPooled = 0;
 
     address poolingAddress = 0x1c0AcCc24e1549125b5b3c14D999D3a496Afbdb1; // haurogs public address (for testing purposes)
 
-    function exchangeCoinToCarbonToken() public payable {}  // Matic
+    function exchangeCoinToCarbonToken() public payable {
+        // Matic
+        // dummy code to call final function
+        forwardCarbonToken(msg.value);
+    }
+
     function exchangeTokenToCarbonToken() public {} // handles every ERC-20 allowed
+
     function swapToCarbonToken() private {} // does the swap
+
     function forwardCarbonToken(uint256 carbonAmount) private {
         // forwards the tokens to the poolingAddress
         totalCarbonPooled += carbonAmount;
@@ -26,5 +33,7 @@ contract Pooling {
             contributorsAddresses.push(msg.sender);
         }
         contributions[msg.sender] += carbonAmount;
+
+        // TODO: Forward to pool address
     }
 }
