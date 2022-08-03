@@ -5,6 +5,7 @@
     "hardhat": "^2.10.0"
   },
   "dependencies": {
+    "@openzeppelin/test-helpers": "^0.5.15",
     "dotenv": "^16.0.1"
   }
 }
