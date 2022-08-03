@@ -22,7 +22,7 @@ describe("Pooling", function () {
     it("Should deploy", async function () {
       const {pooling, owner, otherAccount } = await loadFixture(deployPooling);
 
-      // console.log(pooling)
+      // console.log(JSON.stringify(pooling));
 
       expect(pooling.address != constants.zeroAddress);
     });
