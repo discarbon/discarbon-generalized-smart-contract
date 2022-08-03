@@ -10,7 +10,7 @@ import "hardhat/console.sol";
 
 contract Pooling {
     mapping(address => uint256) public contributions;
-    address[] public contributorsAdresses;
+    address[] public contributorsAddresses;
 
     uint256 totalCarbonPooled = 0;
 
@@ -22,7 +22,7 @@ contract Pooling {
     function forwardCarbonToken(uint256 CarbonAmount) private { // forwards the tokens to the poolingAddress
     totalCarbonPooled += CarbonAmount;
     if (contributions[msg.sender] == 0) {
-        contributorsAdresses.push(msg.sender);
+        contributorsAddresses.push(msg.sender);
     }
     contributions[msg.sender] += CarbonAmount;
 
