@@ -19,12 +19,12 @@ contract Pooling {
     function exchangeCoinToCarbonToken() public payable {}  // Matic
     function exchangeTokenToCarbonToken() public {} // handles every ERC-20 allowed
     function swapToCarbonToken() private {} // does the swap
-    function forwardCarbonToken(uint256 CarbonAmount) private { // forwards the tokens to the poolingAddress
-    totalCarbonPooled += CarbonAmount;
-    if (contributions[msg.sender] == 0) {
-        contributorsAddresses.push(msg.sender);
-    }
-    contributions[msg.sender] += CarbonAmount;
-
+    function forwardCarbonToken(uint256 carbonAmount) private {
+        // forwards the tokens to the poolingAddress
+        totalCarbonPooled += carbonAmount;
+        if (contributions[msg.sender] == 0) {
+            contributorsAddresses.push(msg.sender);
+        }
+        contributions[msg.sender] += carbonAmount;
     }
 }

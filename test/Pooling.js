@@ -20,7 +20,7 @@ describe("Pooling", function () {
 
   describe("Deployment", function () {
     it("Should deploy", async function () {
-      const {pooling, owner, otherAccount } = await loadFixture(deployPooling);
+      const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
 
       // console.log(JSON.stringify(pooling));
 
