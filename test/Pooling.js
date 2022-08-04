@@ -31,11 +31,13 @@ describe("Pooling", function () {
     it("Should record the address and pooled amount", async function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
 
-      const ethToSend1 = ethers.utils.parseEther("0.001");
-      const ethToSend2 = ethers.utils.parseEther("0.00356");
+      const ethToSend1 = ethers.utils.parseEther("0.01");
+      const ethToSend2 = ethers.utils.parseEther("0.02");
+      const carbonToReceive1 = ethers.utils.parseEther("0.001");
+      const carbonToReceive2 = ethers.utils.parseEther("0.002");
 
       // Contribute from first address
-      await pooling.exchangeCoinToCarbonToken({ value: ethToSend1 });
+      await pooling.exchangeCoinToCarbonToken(carbonToReceive1, { value: ethToSend1 });
       let recordedAddress = await pooling.contributorsAddresses(0);
       expect(recordedAddress).to.equal(owner.address);
       let contribution1 = await pooling.contributions(owner.address);
@@ -44,7 +46,7 @@ describe("Pooling", function () {
       expect(totalCarbonPooled).to.equal(contribution1);
 
       // Contribute from second address
-      await pooling.connect(otherAccount).exchangeCoinToCarbonToken({ value: ethToSend2 });
+      await pooling.connect(otherAccount).exchangeCoinToCarbonToken(carbonToReceive2, { value: ethToSend2 });
       expect(await pooling.contributorsAddresses(1)).to.equal(otherAccount.address);
       let contribution2 = await pooling.contributions(otherAccount.address);
       expect(contribution2).to.equal(ethToSend2);
