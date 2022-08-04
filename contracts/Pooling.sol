@@ -26,6 +26,11 @@ contract Pooling {
     address private WMATICAdress = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
     address private USDCAdress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
+    // needed, otherwise uniswap router for matic fails
+    receive() external payable {}
+
+    fallback() external payable {}
+
     function exchangeCoinToCarbonToken(uint256 carbonAmount) public payable {
         // Matic
         // dummy code to call final function
@@ -55,36 +60,29 @@ contract Pooling {
             "Not received enough carbon Tokens"
         );
 
-        // console.log("sent: ", msg.value);
-        // console.log("used: ", amountUsed[0]);
-        // console.log("wanted: ", carbonAmount);
-        // console.log("gotten: ", amountUsed[2]);
-
-        // return excess funds
-        (bool success, ) = msg.sender.call{value: address(this).balance}("");
-        require(success, "refund failed");
-
-        forwardCarbonToken(carbonAmount);
+        doAccounting(carbonAmount);
+        forwardCarbonTokenToPool(carbonAmount);
+        returnExcessMatic();
     }
-
-    // needed, otherwise uniswap router for matic fails
-    receive() external payable {}
-
-    fallback() external payable {}
 
     function exchangeTokenToCarbonToken() public {} // handles every ERC-20 allowed
 
     function swapToCarbonToken() private {} // does the swap
 
-    function forwardCarbonToken(uint256 carbonAmount) private {
-        // Do accounting
+    function doAccounting(uint256 carbonAmount) private {
         totalCarbonPooled += carbonAmount;
         if (contributions[msg.sender] == 0) {
             contributorsAddresses.push(msg.sender);
         }
         contributions[msg.sender] += carbonAmount;
+    }
 
-        // Forward to pool address
+    function returnExcessMatic() private {
+        (bool success, ) = msg.sender.call{value: address(this).balance}("");
+        require(success, "refund failed");
+    }
+
+    function forwardCarbonTokenToPool(uint256 carbonAmount) private {
         IERC20(NCTAdress).transfer(poolingAddress, carbonAmount);
     }
 }
