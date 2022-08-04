@@ -84,7 +84,7 @@ contract Pooling {
         }
         contributions[msg.sender] += carbonAmount;
 
-        // TODO: Forward to pool address
+        // Forward to pool address
         IERC20(NCTAdress).transfer(poolingAddress, carbonAmount);
     }
 }
