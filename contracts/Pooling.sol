@@ -77,7 +77,7 @@ contract Pooling {
     function swapToCarbonToken() private {} // does the swap
 
     function forwardCarbonToken(uint256 carbonAmount) private {
-        // forwards the tokens to the poolingAddress
+        // Do accounting
         totalCarbonPooled += carbonAmount;
         if (contributions[msg.sender] == 0) {
             contributorsAddresses.push(msg.sender);
