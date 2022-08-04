@@ -31,10 +31,7 @@ contract Pooling {
 
     fallback() external payable {}
 
-    function exchangeCoinToCarbonToken(uint256 carbonAmount) public payable {
-        // Matic
-        // dummy code to call final function
-
+    function participateWithMatic(uint256 carbonAmount) public payable {
         address[] memory path = new address[](3);
         path[0] = WMATICAdress;
         path[1] = USDCAdress;
@@ -52,7 +49,7 @@ contract Pooling {
         returnExcessMatic();
     }
 
-    function exchangeTokenToCarbonToken() public {} // handles every ERC-20 allowed
+    function participateWithToken() public {} // handles every ERC-20 allowed
 
     function swapToCarbonToken(uint256 carbonAmount, address[] memory path)
         private
