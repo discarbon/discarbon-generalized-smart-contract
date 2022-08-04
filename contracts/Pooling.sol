@@ -47,12 +47,18 @@ contract Pooling {
             value: msg.value
         }(carbonAmount, path, address(this), block.timestamp);
 
-        // TODO: send surplus back
+        require(carbonAmount == amountUsed[2], "Not received enough carbon Tokens");
 
-        console.log("wanted : ", carbonAmount);
-        console.log("swapped: ", amountUsed[2]);
+        // console.log("sent: ", msg.value);
+        // console.log("used: ", amountUsed[0]);
+        // console.log("wanted: ", carbonAmount);
+        // console.log("gotten: ", amountUsed[2]);
 
-        forwardCarbonToken(msg.value);
+        // return excess funds
+        (bool success,) = msg.sender.call{ value: address(this).balance }("");
+        require(success, "refund failed");
+
+        forwardCarbonToken(carbonAmount);
     }
 
     // needed, otherwise uniswap router for matic fails
