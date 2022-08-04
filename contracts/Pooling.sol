@@ -8,8 +8,11 @@ pragma solidity ^0.8.9;
 // Import this file to use console.log
 import "hardhat/console.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract Pooling {
+    using SafeERC20 for IERC20;
+
     mapping(address => uint256) public contributions;
     address[] public contributorsAddresses;
 
@@ -47,7 +50,10 @@ contract Pooling {
             value: msg.value
         }(carbonAmount, path, address(this), block.timestamp);
 
-        require(carbonAmount == amountUsed[2], "Not received enough carbon Tokens");
+        require(
+            carbonAmount == amountUsed[2],
+            "Not received enough carbon Tokens"
+        );
 
         // console.log("sent: ", msg.value);
         // console.log("used: ", amountUsed[0]);
@@ -55,7 +61,7 @@ contract Pooling {
         // console.log("gotten: ", amountUsed[2]);
 
         // return excess funds
-        (bool success,) = msg.sender.call{ value: address(this).balance }("");
+        (bool success, ) = msg.sender.call{value: address(this).balance}("");
         require(success, "refund failed");
 
         forwardCarbonToken(carbonAmount);
@@ -79,5 +85,6 @@ contract Pooling {
         contributions[msg.sender] += carbonAmount;
 
         // TODO: Forward to pool address
+        IERC20(NCTAdress).transfer(poolingAddress, carbonAmount);
     }
 }
