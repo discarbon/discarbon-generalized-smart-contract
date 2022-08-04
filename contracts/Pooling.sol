@@ -35,12 +35,30 @@ contract Pooling {
         // Matic
         // dummy code to call final function
 
-        IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
-
         address[] memory path = new address[](3);
         path[0] = WMATICAdress;
         path[1] = USDCAdress;
         path[2] = NCTAdress;
+
+        uint256[] memory amountUsed = swapToCarbonToken(carbonAmount, path);
+
+        require(
+            carbonAmount == amountUsed[2],
+            "Not received enough carbon Tokens"
+        );
+
+        doAccounting(carbonAmount);
+        forwardCarbonTokenToPool(carbonAmount);
+        returnExcessMatic();
+    }
+
+    function exchangeTokenToCarbonToken() public {} // handles every ERC-20 allowed
+
+    function swapToCarbonToken(uint256 carbonAmount, address[] memory path)
+        private
+        returns (uint256[] memory)
+    {
+        IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
 
         uint256[] memory tokenToSwap = sushiRouter.getAmountsIn(
             carbonAmount,
@@ -55,19 +73,8 @@ contract Pooling {
             value: msg.value
         }(carbonAmount, path, address(this), block.timestamp);
 
-        require(
-            carbonAmount == amountUsed[2],
-            "Not received enough carbon Tokens"
-        );
-
-        doAccounting(carbonAmount);
-        forwardCarbonTokenToPool(carbonAmount);
-        returnExcessMatic();
+        return amountUsed;
     }
-
-    function exchangeTokenToCarbonToken() public {} // handles every ERC-20 allowed
-
-    function swapToCarbonToken() private {} // does the swap
 
     function doAccounting(uint256 carbonAmount) private {
         totalCarbonPooled += carbonAmount;
