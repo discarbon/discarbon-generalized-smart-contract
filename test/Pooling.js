@@ -1,8 +1,13 @@
 const { time, loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
-
 const { constants, expectRevert } = require('@openzeppelin/test-helpers');
+const ERC20ABI = require("../ABI/ERC20.json");
+
+
+
+const NCTAddress = "0xD838290e877E0188a4A44700463419ED96c16107";
+const poolingAddress = "0x1c0AcCc24e1549125b5b3c14D999D3a496Afbdb1"; // haurogs public address (for testing purposes)
 
 describe("Pooling", function () {
   // We define a fixture to reuse the same setup in every test.
@@ -30,6 +35,7 @@ describe("Pooling", function () {
   describe("Initial transfer", function () {
     it("Should record the address and pooled amount", async function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
 
       const ethToSend1 = ethers.utils.parseEther("0.0123");
       const ethToSend2 = ethers.utils.parseEther("0.0234");
@@ -37,13 +43,21 @@ describe("Pooling", function () {
       const carbonToReceive2 = ethers.utils.parseEther("0.002");
 
       // Contribute from first address
+      NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
+
       await pooling.exchangeCoinToCarbonToken(carbonToReceive1, { value: ethToSend1 });
+
       let recordedAddress = await pooling.contributorsAddresses(0);
       expect(recordedAddress).to.equal(owner.address);
       let contribution1 = await pooling.contributions(owner.address);
       expect(contribution1).to.equal(carbonToReceive1);
       let totalCarbonPooled = await pooling.totalCarbonPooled();
       expect(totalCarbonPooled).to.equal(contribution1);
+
+      NCTBalanceAfter = await NCT.balanceOf(poolingAddress);
+
+      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      expect(NCTBalanceChange).to.equal(carbonToReceive1);
 
       // Contribute from second address
       await pooling.connect(otherAccount).exchangeCoinToCarbonToken(carbonToReceive2, { value: ethToSend2 });
@@ -53,6 +67,7 @@ describe("Pooling", function () {
 
       totalCarbonPooled = await pooling.totalCarbonPooled();
       expect(totalCarbonPooled).to.equal(carbonToReceive1.add(carbonToReceive2));
+
     });
   });
 });
