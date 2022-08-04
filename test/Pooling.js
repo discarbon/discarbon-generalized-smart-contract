@@ -33,7 +33,7 @@ describe("Pooling", function () {
     });
   });
   describe("Initial transfer", function () {
-    it("Should record the address and pooled amount", async function () {
+    it("Should record the address, pooled amount and forward the tokens", async function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
 
@@ -45,7 +45,7 @@ describe("Pooling", function () {
       // Contribute from first address
       NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
 
-      await pooling.exchangeCoinToCarbonToken(carbonToReceive1, { value: ethToSend1 });
+      await pooling.participateWithMatic(carbonToReceive1, { value: ethToSend1 });
 
       let recordedAddress = await pooling.contributorsAddresses(0);
       expect(recordedAddress).to.equal(owner.address);
@@ -60,7 +60,7 @@ describe("Pooling", function () {
       expect(NCTBalanceChange).to.equal(carbonToReceive1);
 
       // Contribute from second address
-      await pooling.connect(otherAccount).exchangeCoinToCarbonToken(carbonToReceive2, { value: ethToSend2 });
+      await pooling.connect(otherAccount).participateWithMatic(carbonToReceive2, { value: ethToSend2 });
       expect(await pooling.contributorsAddresses(1)).to.equal(otherAccount.address);
       let contribution2 = await pooling.contributions(otherAccount.address);
       expect(contribution2).to.equal(carbonToReceive2);
