@@ -7,6 +7,7 @@ const ERC20ABI = require("../ABI/ERC20.json");
 
 
 const NCTAddress = "0xD838290e877E0188a4A44700463419ED96c16107";
+const WMATICAddress = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
 const poolingAddress = "0x1c0AcCc24e1549125b5b3c14D999D3a496Afbdb1"; // haurogs public address (for testing purposes)
 
 describe("Pooling", function () {
@@ -37,15 +38,15 @@ describe("Pooling", function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
 
-      const ethToSend1 = ethers.utils.parseEther("0.0123");
-      const ethToSend2 = ethers.utils.parseEther("0.0234");
+      const maticToSend1 = ethers.utils.parseEther("0.0123");
+      const maticToSend2 = ethers.utils.parseEther("0.0234");
       const carbonToReceive1 = ethers.utils.parseEther("0.001");
       const carbonToReceive2 = ethers.utils.parseEther("0.002");
 
       // Contribute from first address
-      NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
+      const NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
 
-      await pooling.participateWithMatic(carbonToReceive1, { value: ethToSend1 });
+      await pooling.participateWithMatic(carbonToReceive1, { value: maticToSend1 });
 
       let recordedAddress = await pooling.contributorsAddresses(0);
       expect(recordedAddress).to.equal(owner.address);
@@ -60,7 +61,7 @@ describe("Pooling", function () {
       expect(NCTBalanceChange).to.equal(carbonToReceive1);
 
       // Contribute from second address
-      await pooling.connect(otherAccount).participateWithMatic(carbonToReceive2, { value: ethToSend2 });
+      await pooling.connect(otherAccount).participateWithMatic(carbonToReceive2, { value: maticToSend2 });
       expect(await pooling.contributorsAddresses(1)).to.equal(otherAccount.address);
       let contribution2 = await pooling.contributions(otherAccount.address);
       expect(contribution2).to.equal(carbonToReceive2);
@@ -70,4 +71,29 @@ describe("Pooling", function () {
 
     });
   });
-});
+  describe("Test estimate function", function () {
+    it("Should properly estimate the needed amounts (Matic only for the moment)", async function () {
+      const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+
+      const carbonToReceive = ethers.utils.parseEther("0.001");
+
+      // store state before transactions:
+      const NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
+
+      // Contribute from first address
+      let maticEstimated = await pooling.calculateNeededAmount(WMATICAddress, carbonToReceive);
+      await expect(pooling.participateWithMatic(carbonToReceive, { value: maticEstimated })).not.to.be.reverted;
+
+      maticEstimated = await pooling.calculateNeededAmount(WMATICAddress, carbonToReceive);
+      let reducedMaticAmount = maticEstimated.sub(ethers.utils.parseEther("0.0000000001"));
+
+      await expect(pooling.participateWithMatic(carbonToReceive, { value: reducedMaticAmount })).to.be.revertedWith("Not enough Matic to swap to required carbon Token");
+
+      NCTBalanceAfter = await NCT.balanceOf(poolingAddress);
+      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      expect(NCTBalanceChange).to.equal(carbonToReceive);
+
+    });
+  });
+})
