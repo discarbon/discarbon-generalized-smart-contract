@@ -46,7 +46,25 @@ contract Pooling {
         returnExcessMatic();
     }
 
-    function participateWithToken() public {} // handles every ERC-20 allowed
+    // handles every ERC-20 allowed
+    function participateWithToken() public {
+        // Do a special treatment for NCT -> direct accounting and forward
+    }
+
+    // returns the needed amount of coins/tokens
+    function calculateNeededAmount(address fromToken, uint256 amount)
+        public
+        view
+        returns (uint256)
+    {
+        address[] memory path = makePath(fromToken);
+
+        IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
+
+        uint256[] memory amountNeeded = sushiRouter.getAmountsIn(amount, path);
+
+        return amountNeeded[0];
+    }
 
     /// @notice This function creates a path from the initial token to the final token.
     /// It always goes through USDC. So make sure there is actually liquidity on sushiswap for your token path.
