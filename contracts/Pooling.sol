@@ -89,4 +89,16 @@ contract Pooling {
     function forwardCarbonTokenToPool(uint256 carbonAmount) private {
         IERC20(NCTAddress).transfer(poolingAddress, carbonAmount);
     }
+
+    /// @notice A getter function for the array with all the contributors addresses.
+    /// @return an array (can be empty) with all addresses which contributed.
+    function getContributorsAddresses() public view returns (address[] memory) {
+        return contributorsAddresses;
+    }
+
+    /// @notice A function to get the number of contributors.
+    /// @return a number which is the length of the contributorsAddresses array.
+    function getContributorsCount() public view returns (uint256) {
+        return contributorsAddresses.length;
+    }
 }
