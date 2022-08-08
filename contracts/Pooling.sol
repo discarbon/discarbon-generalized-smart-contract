@@ -22,9 +22,9 @@ contract Pooling {
 
     address private sushiRouterAddress =
         0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
-    address private NCTAdress = 0xD838290e877E0188a4A44700463419ED96c16107;
-    address private WMATICAdress = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
-    address private USDCAdress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+    address private NCTAddress = 0xD838290e877E0188a4A44700463419ED96c16107;
+    address private WMATICAddress = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
+    address private USDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
     // needed, otherwise uniswap router for matic fails
     receive() external payable {}
@@ -33,9 +33,9 @@ contract Pooling {
 
     function participateWithMatic(uint256 carbonAmount) public payable {
         address[] memory path = new address[](3);
-        path[0] = WMATICAdress;
-        path[1] = USDCAdress;
-        path[2] = NCTAdress;
+        path[0] = WMATICAddress;
+        path[1] = USDCAddress;
+        path[2] = NCTAddress;
 
         uint256[] memory amountUsed = swapToCarbonToken(carbonAmount, path);
 
@@ -87,6 +87,6 @@ contract Pooling {
     }
 
     function forwardCarbonTokenToPool(uint256 carbonAmount) private {
-        IERC20(NCTAdress).transfer(poolingAddress, carbonAmount);
+        IERC20(NCTAddress).transfer(poolingAddress, carbonAmount);
     }
 }
