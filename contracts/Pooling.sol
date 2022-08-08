@@ -32,10 +32,7 @@ contract Pooling {
     fallback() external payable {}
 
     function participateWithMatic(uint256 carbonAmount) public payable {
-        address[] memory path = new address[](3);
-        path[0] = WMATICAddress;
-        path[1] = USDCAddress;
-        path[2] = NCTAddress;
+        address[] memory path = makePath(WMATICAddress);
 
         uint256[] memory amountUsed = swapToCarbonToken(carbonAmount, path);
 
@@ -50,6 +47,28 @@ contract Pooling {
     }
 
     function participateWithToken() public {} // handles every ERC-20 allowed
+
+    /// @notice This function creates a path from the initial token to the final token.
+    /// It always goes through USDC. So make sure there is actually liquidity on sushiswap for your token path.
+    /// @return an array (can be empty) with all addresses which contributed.
+    function makePath(address fromToken)
+        private
+        view
+        returns (address[] memory)
+    {
+        if (fromToken == USDCAddress) {
+            address[] memory path = new address[](2);
+            path[0] = USDCAddress;
+            path[1] = NCTAddress;
+            return path;
+        } else {
+            address[] memory path = new address[](3);
+            path[0] = WMATICAddress;
+            path[1] = USDCAddress;
+            path[2] = NCTAddress;
+            return path;
+        }
+    }
 
     function swapToCarbonToken(uint256 carbonAmount, address[] memory path)
         private
