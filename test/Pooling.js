@@ -107,11 +107,9 @@ describe("Pooling", function () {
   describe("Test participation with token", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
-      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
 
-      console.log("Balance before: ", await NCT.balanceOf(owner.address))
-      await fundWalletWithToken(NCTAddress, NCTWhaleAddress, owner.address, 111);
-      console.log("Balance after: ", await NCT.balanceOf(owner.address))
+      const fundingAmount = ethers.utils.parseEther("50");
+      await fundWalletWithTokens(owner.address, fundingAmount);
 
 
 
@@ -151,15 +149,34 @@ describe("Pooling", function () {
   });
 })
 
-async function fundWalletWithToken(tokenAddress, tokenWhaleAddress, addressToFund, amount) {
+async function fundWalletWithTokens(AddressToFund, amount) {
+  const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+  const USDC = new ethers.Contract(USDCAddress, ERC20ABI, ethers.provider);
+  const DAI = new ethers.Contract(DAIAddress, ERC20ABI, ethers.provider);
+  const WETH = new ethers.Contract(WETHAddress, ERC20ABI, ethers.provider);
 
+  await fundWalletWithSingleToken(NCTAddress, NCTWhaleAddress, AddressToFund, amount);
+
+  // Special treatment for USDC. USDC only has 6 decimals instead of 12
+  const humanReadableAmount = ethers.utils.formatEther(amount);
+  const USDCamount = ethers.utils.parseUnits(humanReadableAmount, 6);
+  await fundWalletWithSingleToken(USDCAddress, USDCWhaleAddress, AddressToFund, USDCamount);
+  await fundWalletWithSingleToken(DAIAddress, DAIWhaleAddress, AddressToFund, amount);
+  await fundWalletWithSingleToken(WETHAddress, WETHWhaleAddress, AddressToFund, amount);
+
+  // console.log("NCT Balance", ethers.utils.formatEther(await NCT.balanceOf(AddressToFund)));
+  // console.log("USDC Balance", ethers.utils.formatUnits(await USDC.balanceOf(AddressToFund), 6));
+  // console.log("DAI Balance", ethers.utils.formatEther(await DAI.balanceOf(AddressToFund)));
+  // console.log("WETH Balance", ethers.utils.formatEther(await WETH.balanceOf(AddressToFund)));
+}
+
+async function fundWalletWithSingleToken(tokenAddress, tokenWhaleAddress, addressToFund, amount) {
   await hre.network.provider.request({
     method: "hardhat_impersonateAccount",
     params: [tokenWhaleAddress],
   });
 
   const tokenWhaleSigner = await ethers.getSigner(tokenWhaleAddress)
-
   const provider = ethers.provider;
   const tokenContract = new ethers.Contract(tokenAddress, ERC20ABI, provider);
 
