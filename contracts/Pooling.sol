@@ -47,8 +47,44 @@ contract Pooling {
     }
 
     // handles every ERC-20 allowed
-    function participateWithToken() public {
-        // Do a special treatment for NCT -> direct accounting and forward
+    function participateWithToken(address token, uint256 carbonAmount) public {
+        // Skip swap if NCT is supplied
+        if (token != NCTAddress) {
+            IUniswapV2Router02 routerSushi = IUniswapV2Router02(
+                sushiRouterAddress
+            );
+            address[] memory path = makePath(token);
+            uint256[] memory tokensNeeded = routerSushi.getAmountsIn(
+                carbonAmount,
+                path
+            );
+            // transfer tokens to this contract
+            IERC20(token).safeTransferFrom(
+                msg.sender,
+                address(this),
+                tokensNeeded[0]
+            );
+            // approve tokens for sushiRouter
+            IERC20(token).approve(sushiRouterAddress, tokensNeeded[0]);
+            // swap
+            routerSushi.swapTokensForExactTokens(
+                carbonAmount,
+                tokensNeeded[0],
+                path,
+                address(this),
+                block.timestamp
+            );
+        } else {
+            // fotransfer NCT tokens
+            IERC20(token).safeTransferFrom(
+                msg.sender,
+                address(this),
+                carbonAmount
+            );
+        }
+
+        doAccounting(carbonAmount);
+        forwardCarbonTokenToPool(carbonAmount);
     }
 
     // returns the needed amount of coins/tokens
