@@ -33,7 +33,7 @@ describe("Pooling", function () {
       expect(pooling.address != constants.zeroAddress);
     });
   });
-  describe("Initial transfer", function () {
+  describe("Participation with MATIC", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
@@ -72,7 +72,7 @@ describe("Pooling", function () {
     });
   });
   describe("Test estimate function", function () {
-    it("Should properly estimate the needed amounts (Matic only for the moment)", async function () {
+    it("Should record the address, pooled amount and forward the tokens", async function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
 
@@ -96,4 +96,66 @@ describe("Pooling", function () {
 
     });
   });
+  describe("Test participation with token", function () {
+    it("Should record the address, pooled amount and forward the tokens", async function () {
+      const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+
+      NCTWhaleAddress = "0x4b3ebAe392E8B90A9b13068e90b27D9c41aBc3c8";
+
+      console.log("Balance before: ", await NCT.balanceOf(owner.address))
+      await fundWalletWithToken(NCTAddress, NCTWhaleAddress, owner.address, 111);
+      console.log("Balance after: ", await NCT.balanceOf(owner.address))
+
+
+
+
+      // const maticToSend1 = ethers.utils.parseEther("0.0123");
+      // const maticToSend2 = ethers.utils.parseEther("0.0234");
+      // const carbonToReceive1 = ethers.utils.parseEther("0.001");
+      // const carbonToReceive2 = ethers.utils.parseEther("0.002");
+
+      // // Contribute from first address
+      // const NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
+
+      // await pooling.participateWithMatic(carbonToReceive1, { value: maticToSend1 });
+
+      // let recordedAddress = await pooling.contributorsAddresses(0);
+      // expect(recordedAddress).to.equal(owner.address);
+      // let contribution1 = await pooling.contributions(owner.address);
+      // expect(contribution1).to.equal(carbonToReceive1);
+      // let totalCarbonPooled = await pooling.totalCarbonPooled();
+      // expect(totalCarbonPooled).to.equal(contribution1);
+
+      // NCTBalanceAfter = await NCT.balanceOf(poolingAddress);
+
+      // NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      // expect(NCTBalanceChange).to.equal(carbonToReceive1);
+
+      // // Contribute from second address
+      // await pooling.connect(otherAccount).participateWithMatic(carbonToReceive2, { value: maticToSend2 });
+      // expect(await pooling.contributorsAddresses(1)).to.equal(otherAccount.address);
+      // let contribution2 = await pooling.contributions(otherAccount.address);
+      // expect(contribution2).to.equal(carbonToReceive2);
+
+      // totalCarbonPooled = await pooling.totalCarbonPooled();
+      // expect(totalCarbonPooled).to.equal(carbonToReceive1.add(carbonToReceive2));
+
+    });
+  });
 })
+
+async function fundWalletWithToken(tokenAddress, tokenWhaleAddress, addressToFund, amount) {
+
+  await hre.network.provider.request({
+    method: "hardhat_impersonateAccount",
+    params: [tokenWhaleAddress],
+  });
+
+  const tokenWhaleSigner = await ethers.getSigner(tokenWhaleAddress)
+
+  const provider = ethers.provider;
+  const tokenContract = new ethers.Contract(tokenAddress, ERC20ABI, provider);
+
+  await tokenContract.connect(tokenWhaleSigner).transfer(addressToFund, amount);
+}
