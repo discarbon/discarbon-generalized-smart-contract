@@ -5,10 +5,18 @@ const { constants, expectRevert } = require('@openzeppelin/test-helpers');
 const ERC20ABI = require("../ABI/ERC20.json");
 
 
+const poolingAddress = "0x1c0AcCc24e1549125b5b3c14D999D3a496Afbdb1"; // haurogs public address (for testing purposes)
 
 const NCTAddress = "0xD838290e877E0188a4A44700463419ED96c16107";
 const WMATICAddress = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
-const poolingAddress = "0x1c0AcCc24e1549125b5b3c14D999D3a496Afbdb1"; // haurogs public address (for testing purposes)
+const USDCAddress = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+const DAIAddress = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
+const WETHAddress = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
+
+const NCTWhaleAddress = "0x4b3ebAe392E8B90A9b13068e90b27D9c41aBc3c8";
+const USDCWhaleAddress = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
+const DAIWhaleAddress = "0x06959153B974D0D5fDfd87D561db6d8d4FA0bb0B";
+const WETHWhaleAddress = "0x72A53cDBBcc1b9efa39c834A540550e23463AAcB";
 
 describe("Pooling", function () {
   // We define a fixture to reuse the same setup in every test.
@@ -100,8 +108,6 @@ describe("Pooling", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
-
-      NCTWhaleAddress = "0x4b3ebAe392E8B90A9b13068e90b27D9c41aBc3c8";
 
       console.log("Balance before: ", await NCT.balanceOf(owner.address))
       await fundWalletWithToken(NCTAddress, NCTWhaleAddress, owner.address, 111);
