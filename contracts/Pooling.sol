@@ -46,7 +46,7 @@ contract Pooling {
         returnExcessMatic();
     }
 
-    // handles every ERC-20 allowed
+    // handles every ERC-20
     function participateWithToken(address token, uint256 carbonAmount) public {
         // Skip swap if NCT is supplied
         if (token != NCTAddress) {
@@ -75,7 +75,7 @@ contract Pooling {
                 block.timestamp
             );
         } else {
-            // fotransfer NCT tokens
+            // for NCT tokens
             IERC20(token).safeTransferFrom(
                 msg.sender,
                 address(this),
@@ -122,7 +122,7 @@ contract Pooling {
             return path;
         } else {
             address[] memory path = new address[](3);
-            path[0] = WMATICAddress;
+            path[0] = fromToken;
             path[1] = USDCAddress;
             path[2] = NCTAddress;
             return path;
