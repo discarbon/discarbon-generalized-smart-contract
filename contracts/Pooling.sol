@@ -93,6 +93,11 @@ contract Pooling {
         view
         returns (uint256)
     {
+        // if NCT is supplied no swap necessary
+        if (fromToken == NCTAddress) {
+            return amount;
+        }
+
         address[] memory path = makePath(fromToken);
 
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
