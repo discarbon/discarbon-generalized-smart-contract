@@ -14,6 +14,7 @@ const DAIAddress = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
 const WETHAddress = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
 
 const NCTWhaleAddress = "0x4b3ebAe392E8B90A9b13068e90b27D9c41aBc3c8";
+const WMATICWhaleAddress = "0x01aeFAC4A308FbAeD977648361fBAecFBCd380C7";
 const USDCWhaleAddress = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
 const DAIWhaleAddress = "0x06959153B974D0D5fDfd87D561db6d8d4FA0bb0B";
 const WETHWhaleAddress = "0x72A53cDBBcc1b9efa39c834A540550e23463AAcB";
@@ -104,59 +105,85 @@ describe("Pooling", function () {
 
     });
   });
-  describe("Test participation with token", function () {
+  describe("Test participate with USDC", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+      const USDC = new ethers.Contract(USDCAddress, ERC20ABI, ethers.provider);
 
       const fundingAmount = ethers.utils.parseEther("50");
       await fundWalletWithTokens(owner.address, fundingAmount);
+      const carbonToReceive = ethers.utils.parseEther("0.1");
 
+      // normal contribution
+      const NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
+      let USDCEstimated = await pooling.calculateNeededAmount(USDCAddress, carbonToReceive);
+      // console.log("USDC: ", USDCEstimated);
+      await USDC.connect(owner).approve(pooling.address, USDCEstimated);
+      await expect(pooling.participateWithToken(USDCAddress, carbonToReceive)).not.to.be.reverted;
 
+      NCTBalanceAfter = await NCT.balanceOf(poolingAddress);
+      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
 
+      // Check accounting
+      let recordedAddress = await pooling.contributorsAddresses(0);
+      expect(recordedAddress).to.equal(owner.address);
+      let contribution = await pooling.contributions(owner.address);
+      expect(contribution).to.equal(carbonToReceive);
+      // Check balances sent to pooling address
+      expect(NCTBalanceChange).to.equal(carbonToReceive);
 
-      // const maticToSend1 = ethers.utils.parseEther("0.0123");
-      // const maticToSend2 = ethers.utils.parseEther("0.0234");
-      // const carbonToReceive1 = ethers.utils.parseEther("0.001");
-      // const carbonToReceive2 = ethers.utils.parseEther("0.002");
+      // Approve less than estimated and see that it fails
+      USDCEstimated = await pooling.calculateNeededAmount(USDCAddress, carbonToReceive);
+      await USDC.connect(owner).approve(pooling.address, USDCEstimated.sub(1));
+      await expect(pooling.participateWithToken(USDCAddress, carbonToReceive)).to.be.reverted;
+    });
+  });
+  describe("Test participate with WMATIC", function () {
+    it("Should record the address, pooled amount and forward the tokens", async function () {
+      const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+      const WMATIC = new ethers.Contract(WMATICAddress, ERC20ABI, ethers.provider);
 
-      // // Contribute from first address
-      // const NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
+      const carbonToReceive = ethers.utils.parseEther("0.1");
+      const fundingAmount = ethers.utils.parseEther("50");
+      await fundWalletWithTokens(owner.address, fundingAmount);
 
-      // await pooling.participateWithMatic(carbonToReceive1, { value: maticToSend1 });
+      // normal contribution
+      const NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
+      let WMATICEstimated = await pooling.calculateNeededAmount(WMATICAddress, carbonToReceive);
+      // console.log("WMATIC: ", WMATICEstimated);
+      await WMATIC.connect(owner).approve(pooling.address, WMATICEstimated);
+      await expect(pooling.participateWithToken(WMATICAddress, carbonToReceive)).not.to.be.reverted;
 
-      // let recordedAddress = await pooling.contributorsAddresses(0);
-      // expect(recordedAddress).to.equal(owner.address);
-      // let contribution1 = await pooling.contributions(owner.address);
-      // expect(contribution1).to.equal(carbonToReceive1);
-      // let totalCarbonPooled = await pooling.totalCarbonPooled();
-      // expect(totalCarbonPooled).to.equal(contribution1);
+      NCTBalanceAfter = await NCT.balanceOf(poolingAddress);
+      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
 
-      // NCTBalanceAfter = await NCT.balanceOf(poolingAddress);
+      // Check accounting
+      let recordedAddress = await pooling.contributorsAddresses(0);
+      expect(recordedAddress).to.equal(owner.address);
+      let contribution = await pooling.contributions(owner.address);
+      expect(contribution).to.equal(carbonToReceive);
+      // Check balances sent to pooling address
+      expect(NCTBalanceChange).to.equal(carbonToReceive);
 
-      // NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
-      // expect(NCTBalanceChange).to.equal(carbonToReceive1);
-
-      // // Contribute from second address
-      // await pooling.connect(otherAccount).participateWithMatic(carbonToReceive2, { value: maticToSend2 });
-      // expect(await pooling.contributorsAddresses(1)).to.equal(otherAccount.address);
-      // let contribution2 = await pooling.contributions(otherAccount.address);
-      // expect(contribution2).to.equal(carbonToReceive2);
-
-      // totalCarbonPooled = await pooling.totalCarbonPooled();
-      // expect(totalCarbonPooled).to.equal(carbonToReceive1.add(carbonToReceive2));
-
+      // Approve less than estimated and see that it fails
+      WMATICEstimated = await pooling.calculateNeededAmount(WMATICAddress, carbonToReceive);
+      await WMATIC.connect(owner).approve(pooling.address, WMATICEstimated.sub(1));
+      await expect(pooling.participateWithToken(WMATICAddress, carbonToReceive)).to.be.reverted;
     });
   });
 })
 
 async function fundWalletWithTokens(AddressToFund, amount) {
   const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+  const WMATIC = new ethers.Contract(WMATICAddress, ERC20ABI, ethers.provider);
   const USDC = new ethers.Contract(USDCAddress, ERC20ABI, ethers.provider);
   const DAI = new ethers.Contract(DAIAddress, ERC20ABI, ethers.provider);
   const WETH = new ethers.Contract(WETHAddress, ERC20ABI, ethers.provider);
 
   await fundWalletWithSingleToken(NCTAddress, NCTWhaleAddress, AddressToFund, amount);
-
+  await fundWalletWithSingleToken(WMATICAddress, WMATICWhaleAddress, AddressToFund, amount);
   // Special treatment for USDC. USDC only has 6 decimals instead of 12
   const humanReadableAmount = ethers.utils.formatEther(amount);
   const USDCamount = ethers.utils.parseUnits(humanReadableAmount, 6);
@@ -165,6 +192,7 @@ async function fundWalletWithTokens(AddressToFund, amount) {
   await fundWalletWithSingleToken(WETHAddress, WETHWhaleAddress, AddressToFund, amount);
 
   // console.log("NCT Balance", ethers.utils.formatEther(await NCT.balanceOf(AddressToFund)));
+  // console.log("WMATIC Balance", ethers.utils.formatEther(await WMATIC.balanceOf(AddressToFund)));
   // console.log("USDC Balance", ethers.utils.formatUnits(await USDC.balanceOf(AddressToFund), 6));
   // console.log("DAI Balance", ethers.utils.formatEther(await DAI.balanceOf(AddressToFund)));
   // console.log("WETH Balance", ethers.utils.formatEther(await WETH.balanceOf(AddressToFund)));
