@@ -173,6 +173,40 @@ describe("Pooling", function () {
       await expect(pooling.participateWithToken(WMATICAddress, carbonToReceive)).to.be.reverted;
     });
   });
+  describe("Test participate with DAI", function () {
+    it("Should record the address, pooled amount and forward the tokens", async function () {
+      const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+      const DAI = new ethers.Contract(DAIAddress, ERC20ABI, ethers.provider);
+
+      const carbonToReceive = ethers.utils.parseEther("0.1");
+      const fundingAmount = ethers.utils.parseEther("50");
+      await fundWalletWithTokens(owner.address, fundingAmount);
+
+      // normal contribution
+      const NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
+      let DAIEstimated = await pooling.calculateNeededAmount(DAIAddress, carbonToReceive);
+      // console.log("DAI: ", DAIEstimated);
+      await DAI.connect(owner).approve(pooling.address, DAIEstimated);
+      await expect(pooling.participateWithToken(DAIAddress, carbonToReceive)).not.to.be.reverted;
+
+      NCTBalanceAfter = await NCT.balanceOf(poolingAddress);
+      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+
+      // Check accounting
+      let recordedAddress = await pooling.contributorsAddresses(0);
+      expect(recordedAddress).to.equal(owner.address);
+      let contribution = await pooling.contributions(owner.address);
+      expect(contribution).to.equal(carbonToReceive);
+      // Check balances sent to pooling address
+      expect(NCTBalanceChange).to.equal(carbonToReceive);
+
+      // Approve less than estimated and see that it fails
+      DAIEstimated = await pooling.calculateNeededAmount(DAIAddress, carbonToReceive);
+      await DAI.connect(owner).approve(pooling.address, DAIEstimated.sub(1));
+      await expect(pooling.participateWithToken(DAIAddress, carbonToReceive)).to.be.reverted;
+    });
+  });
   describe("Test participate with NCT", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
