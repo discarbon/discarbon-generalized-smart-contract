@@ -5,7 +5,7 @@ const { constants, expectRevert } = require('@openzeppelin/test-helpers');
 const ERC20ABI = require("../ABI/ERC20.json");
 
 
-const poolingAddress = "0x1c0AcCc24e1549125b5b3c14D999D3a496Afbdb1"; // haurogs public address (for testing purposes)
+const poolingAddress = "0x967AF011954F71835167e88b61226B96CD558896"; // discarbon controlled address (for testing purposes)
 
 const NCTAddress = "0xD838290e877E0188a4A44700463419ED96c16107";
 const WMATICAddress = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";

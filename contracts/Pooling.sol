@@ -18,7 +18,7 @@ contract Pooling {
 
     uint256 public totalCarbonPooled = 0;
 
-    address public poolingAddress = 0x1c0AcCc24e1549125b5b3c14D999D3a496Afbdb1; // haurogs public address (for testing purposes)
+    address public poolingAddress = 0x967AF011954F71835167e88b61226B96CD558896; // discarbon controlled address (for testing purposes)
 
     address private sushiRouterAddress =
         0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
