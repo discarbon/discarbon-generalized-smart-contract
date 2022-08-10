@@ -172,40 +172,40 @@ describe("Pooling", function () {
       await WMATIC.connect(owner).approve(pooling.address, WMATICEstimated.sub(1));
       await expect(pooling.participateWithToken(WMATICAddress, carbonToReceive)).to.be.reverted;
     });
-    describe("Test participate with NCT", function () {
-      it("Should record the address, pooled amount and forward the tokens", async function () {
-        const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
-        const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+  });
+  describe("Test participate with NCT", function () {
+    it("Should record the address, pooled amount and forward the tokens", async function () {
+      const { pooling, owner, otherAccount } = await loadFixture(deployPooling);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
 
-        const carbonToReceive = ethers.utils.parseEther("0.1");
-        const fundingAmount = ethers.utils.parseEther("50");
-        await fundWalletWithTokens(owner.address, fundingAmount);
+      const carbonToReceive = ethers.utils.parseEther("0.1");
+      const fundingAmount = ethers.utils.parseEther("50");
+      await fundWalletWithTokens(owner.address, fundingAmount);
 
-        // normal contribution
-        const NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
-        let NCTEstimated = await pooling.calculateNeededAmount(NCTAddress, carbonToReceive);
-        // console.log("NCT: ", NCTEstimated);
-        await NCT.connect(owner).approve(pooling.address, NCTEstimated);
-        await expect(pooling.participateWithToken(NCTAddress, carbonToReceive)).not.to.be.reverted;
+      // normal contribution
+      const NCTBalanceBefore = await NCT.balanceOf(poolingAddress);
+      let NCTEstimated = await pooling.calculateNeededAmount(NCTAddress, carbonToReceive);
+      // console.log("NCT: ", NCTEstimated);
+      await NCT.connect(owner).approve(pooling.address, NCTEstimated);
+      await expect(pooling.participateWithToken(NCTAddress, carbonToReceive)).not.to.be.reverted;
 
-        NCTBalanceAfter = await NCT.balanceOf(poolingAddress);
-        NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      NCTBalanceAfter = await NCT.balanceOf(poolingAddress);
+      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
 
-        // Check accounting
-        let recordedAddress = await pooling.contributorsAddresses(0);
-        expect(recordedAddress).to.equal(owner.address);
-        let contribution = await pooling.contributions(owner.address);
-        expect(contribution).to.equal(carbonToReceive);
-        // Check balances sent to pooling address
-        expect(NCTBalanceChange).to.equal(carbonToReceive);
+      // Check accounting
+      let recordedAddress = await pooling.contributorsAddresses(0);
+      expect(recordedAddress).to.equal(owner.address);
+      let contribution = await pooling.contributions(owner.address);
+      expect(contribution).to.equal(carbonToReceive);
+      // Check balances sent to pooling address
+      expect(NCTBalanceChange).to.equal(carbonToReceive);
 
-        // Approve less than estimated and see that it fails
-        NCTEstimated = await pooling.calculateNeededAmount(NCTAddress, carbonToReceive);
-        // console.log("NCT: ", NCTEstimated);
+      // Approve less than estimated and see that it fails
+      NCTEstimated = await pooling.calculateNeededAmount(NCTAddress, carbonToReceive);
+      // console.log("NCT: ", NCTEstimated);
 
-        await NCT.connect(owner).approve(pooling.address, NCTEstimated.sub(1));
-        await expect(pooling.participateWithToken(NCTAddress, carbonToReceive)).to.be.reverted;
-      });
+      await NCT.connect(owner).approve(pooling.address, NCTEstimated.sub(1));
+      await expect(pooling.participateWithToken(NCTAddress, carbonToReceive)).to.be.reverted;
     });
   });
 })
