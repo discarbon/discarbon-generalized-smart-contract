@@ -26,6 +26,8 @@ contract Pooling {
     address private WMATICAddress = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
     address private USDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
+    event ContributionSent(string tokenOrCoin, uint256 carbonTokenContributed);
+
     // needed, otherwise uniswap router for matic fails
     receive() external payable {}
 
@@ -44,6 +46,7 @@ contract Pooling {
         doAccounting(carbonAmount);
         forwardCarbonTokenToPool(carbonAmount);
         returnExcessMatic();
+        emit ContributionSent("Matic", carbonAmount);
     }
 
     // handles every ERC-20
@@ -85,6 +88,7 @@ contract Pooling {
 
         doAccounting(carbonAmount);
         forwardCarbonTokenToPool(carbonAmount);
+        emit ContributionSent("Token", carbonAmount);
     }
 
     // returns the needed amount of coins/tokens

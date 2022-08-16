@@ -57,7 +57,9 @@ describe("Pooling", function () {
       // Contribute from first address
       const NCTBalanceBefore = await NCT.balanceOf(poolAddress);
 
-      await pooling.participateWithMatic(carbonToReceive1, { value: maticToSend1 });
+      await expect(pooling.participateWithMatic(carbonToReceive1, { value: maticToSend1 }))
+        .to.emit(pooling, "ContributionSent")
+        .withArgs("Matic", carbonToReceive1);
 
       let recordedAddress = await pooling.contributorsAddresses(0);
       expect(recordedAddress).to.equal(deployer.address);
@@ -122,7 +124,9 @@ describe("Pooling", function () {
       let USDCEstimated = await pooling.calculateNeededAmount(USDCAddress, carbonToReceive);
       // console.log("USDC: ", USDCEstimated);
       await USDC.connect(deployer).approve(pooling.address, USDCEstimated);
-      await expect(pooling.participateWithToken(USDCAddress, carbonToReceive)).not.to.be.reverted;
+      await expect(pooling.participateWithToken(USDCAddress, carbonToReceive))
+      .to.emit(pooling, "ContributionSent")
+      .withArgs("Token", carbonToReceive);
 
       NCTBalanceAfter = await NCT.balanceOf(poolAddress);
       NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
@@ -156,7 +160,9 @@ describe("Pooling", function () {
       let WMATICEstimated = await pooling.calculateNeededAmount(WMATICAddress, carbonToReceive);
       // console.log("WMATIC: ", WMATICEstimated);
       await WMATIC.connect(deployer).approve(pooling.address, WMATICEstimated);
-      await expect(pooling.participateWithToken(WMATICAddress, carbonToReceive)).not.to.be.reverted;
+      await expect(pooling.participateWithToken(WMATICAddress, carbonToReceive))
+      .to.emit(pooling, "ContributionSent")
+      .withArgs("Token", carbonToReceive);
 
       NCTBalanceAfter = await NCT.balanceOf(poolAddress);
       NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
@@ -190,7 +196,9 @@ describe("Pooling", function () {
       let DAIEstimated = await pooling.calculateNeededAmount(DAIAddress, carbonToReceive);
       // console.log("DAI: ", DAIEstimated);
       await DAI.connect(deployer).approve(pooling.address, DAIEstimated);
-      await expect(pooling.participateWithToken(DAIAddress, carbonToReceive)).not.to.be.reverted;
+      await expect(pooling.participateWithToken(DAIAddress, carbonToReceive))
+      .to.emit(pooling, "ContributionSent")
+      .withArgs("Token", carbonToReceive);
 
       NCTBalanceAfter = await NCT.balanceOf(poolAddress);
       NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
@@ -224,7 +232,9 @@ describe("Pooling", function () {
       let WETHEstimated = await pooling.calculateNeededAmount(WETHAddress, carbonToReceive);
       // console.log("WETH: ", WETHEstimated);
       await WETH.connect(deployer).approve(pooling.address, WETHEstimated);
-      await expect(pooling.participateWithToken(WETHAddress, carbonToReceive)).not.to.be.reverted;
+      await expect(pooling.participateWithToken(WETHAddress, carbonToReceive))
+      .to.emit(pooling, "ContributionSent")
+      .withArgs("Token", carbonToReceive);
 
       NCTBalanceAfter = await NCT.balanceOf(poolAddress);
       NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
@@ -257,7 +267,9 @@ describe("Pooling", function () {
       let NCTEstimated = await pooling.calculateNeededAmount(NCTAddress, carbonToReceive);
       // console.log("NCT: ", NCTEstimated);
       await NCT.connect(deployer).approve(pooling.address, NCTEstimated);
-      await expect(pooling.participateWithToken(NCTAddress, carbonToReceive)).not.to.be.reverted;
+      await expect(pooling.participateWithToken(NCTAddress, carbonToReceive))
+      .to.emit(pooling, "ContributionSent")
+      .withArgs("Token", carbonToReceive);
 
       NCTBalanceAfter = await NCT.balanceOf(poolAddress);
       NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
