@@ -1,1 +1,3 @@
-ALCHEMY_POLYGON_API_KEY=1234
+ALCHEMY_POLYGON_API_KEY = 1234
+POLYGONSCAN_API_KEY = 1234
+MNEMONIC = never ever put anything here copy the file to .env first
