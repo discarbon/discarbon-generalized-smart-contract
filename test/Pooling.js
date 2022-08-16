@@ -30,6 +30,8 @@ describe("Pooling", function () {
     const Pooling = await ethers.getContractFactory("Pooling");
     const pooling = await Pooling.deploy();
 
+    // console.log("deployer: ", deployer.address)
+
     return { pooling, deployer, otherAccount };
   }
 
