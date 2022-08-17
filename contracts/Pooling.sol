@@ -105,26 +105,26 @@ contract Pooling {
     ///         the swapped tokens. Only takes as many tokens as needed.
     /// @param fromToken Address of the token that should be used to participate.
     ///        To estimate Matic tokens, use WMATIC address.
-    /// @param amount Carbon Amount that needs to be purchased.
-    /// @return amountNeeded How many tokens/coins needed for buying the needed
+    /// @param carbonAmount Carbon Amount that needs to be purchased.
+    /// @return tokenAmountNeeded How many tokens/coins needed for buying the needed
     ///         carbon tokens.
-    function calculateNeededAmount(address fromToken, uint256 amount)
+    function calculateNeededAmount(address fromToken, uint256 carbonAmount)
         public
         view
         returns (uint256)
     {
         // if NCT is supplied no swap necessary
         if (fromToken == NCTAddress) {
-            return amount;
+            return carbonAmount;
         }
 
         address[] memory path = makePath(fromToken);
 
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
 
-        uint256[] memory amountNeeded = sushiRouter.getAmountsIn(amount, path);
+        uint256[] memory tokenAmountNeeded = sushiRouter.getAmountsIn(carbonAmount, path);
 
-        return amountNeeded[0];
+        return tokenAmountNeeded[0];
     }
 
     /// @notice This function creates a path from the initial token to the final

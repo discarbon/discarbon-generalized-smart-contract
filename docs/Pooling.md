@@ -13,7 +13,7 @@ This contract exchanges the coins/tokens of the users for carbon         tokens 
 ### calculateNeededAmount
 
 ```solidity
-function calculateNeededAmount(address fromToken, uint256 amount) external view returns (uint256)
+function calculateNeededAmount(address fromToken, uint256 carbonAmount) external view returns (uint256)
 ```
 
 returns the needed amount of coins/tokens.         the swapped tokens. Only takes as many tokens as needed.
@@ -25,13 +25,13 @@ returns the needed amount of coins/tokens.         the swapped tokens. Only take
 | Name | Type | Description |
 |---|---|---|
 | fromToken | address | Address of the token that should be used to participate.        To estimate Matic tokens, use WMATIC address. |
-| amount | uint256 | Carbon Amount that needs to be purchased. |
+| carbonAmount | uint256 | Carbon Amount that needs to be purchased. |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | amountNeeded How many tokens/coins needed for buying the needed         carbon tokens. |
+| _0 | uint256 | tokenAmountNeeded How many tokens/coins needed for buying the needed         carbon tokens. |
 
 ### contributions
 
