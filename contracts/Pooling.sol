@@ -41,9 +41,8 @@ contract Pooling {
     ///         tokens. Returns any excess Matic.
     /// @param carbonAmount The number of carbon tokens that need to be forwarded.
     function participateWithMatic(uint256 carbonAmount) public payable {
-        address[] memory path = makePath(WMATICAddress);
 
-        swapMaticToCarbonToken(carbonAmount, path);
+        swapMaticToCarbonToken(carbonAmount);
         doAccounting(carbonAmount);
         forwardCarbonTokenToPool(carbonAmount);
         returnExcessMatic();
@@ -130,10 +129,13 @@ contract Pooling {
     }
 
     /// @notice Does the swap for Matic coins.
-    function swapMaticToCarbonToken(uint256 carbonAmount, address[] memory path)
+    function swapMaticToCarbonToken(uint256 carbonAmount)
         private
     {
+
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
+        address[] memory path = makePath(WMATICAddress);
+
 
         uint256[] memory tokenToSwap = sushiRouter.getAmountsIn(
             carbonAmount,
