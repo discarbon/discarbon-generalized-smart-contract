@@ -66,16 +66,16 @@ contract Pooling {
     function participateWithToken(address fromToken, uint256 carbonAmount)
         public
     {
-        // Skip swap if NCT is supplied
-        if (fromToken != NCTAddress) {
-            swapTokenToCarbonToken(fromToken, carbonAmount);
-        } else {
-            // For NCT tokens. Transfer NCT tokens.
+        if (fromToken == NCTAddress) {
+            // Directly transfer NCT tokens.
             IERC20(fromToken).safeTransferFrom(
                 msg.sender,
                 address(this),
                 carbonAmount
             );
+        } else {
+            // for all other tokens do a swap.
+            swapTokenToCarbonToken(fromToken, carbonAmount);
         }
 
         doAccounting(carbonAmount);
