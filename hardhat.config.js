@@ -1,6 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv/config")
-
+require('@primitivefi/hardhat-dodoc');  // creates docs from every time one compiles
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
