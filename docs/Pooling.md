@@ -130,7 +130,7 @@ Receives Matic, swaps to carbon token and forwards the swapped         tokens. R
 ### participateWithToken
 
 ```solidity
-function participateWithToken(address token, uint256 carbonAmount) external nonpayable
+function participateWithToken(address fromToken, uint256 carbonAmount) external nonpayable
 ```
 
 Takes user approved token, swaps to carbon token and forwards         the swapped tokens. Only takes as many tokens as needed.
@@ -141,7 +141,7 @@ Takes user approved token, swaps to carbon token and forwards         the swappe
 
 | Name | Type | Description |
 |---|---|---|
-| token | address | Address of the token that should be used to participate. |
+| fromToken | address | Address of the token that should be used to participate. |
 | carbonAmount | uint256 | The number of carbon tokens that need to be forwarded. |
 
 ### poolingAddress

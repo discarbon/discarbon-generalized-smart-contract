@@ -43,7 +43,10 @@ contract Pooling {
     function participateWithMatic(uint256 carbonAmount) public payable {
         address[] memory path = makePath(WMATICAddress);
 
-        uint256[] memory amountUsed = swapMaticToCarbonToken(carbonAmount, path);
+        uint256[] memory amountUsed = swapMaticToCarbonToken(
+            carbonAmount,
+            path
+        );
 
         require(
             carbonAmount == amountUsed[2],
@@ -58,38 +61,17 @@ contract Pooling {
 
     /// @notice Takes user approved token, swaps to carbon token and forwards
     ///         the swapped tokens. Only takes as many tokens as needed.
-    /// @param token Address of the token that should be used to participate.
+    /// @param fromToken Address of the token that should be used to participate.
     /// @param carbonAmount The number of carbon tokens that need to be forwarded.
-    function participateWithToken(address token, uint256 carbonAmount) public {
+    function participateWithToken(address fromToken, uint256 carbonAmount)
+        public
+    {
         // Skip swap if NCT is supplied
-        if (token != NCTAddress) {
-            IUniswapV2Router02 routerSushi = IUniswapV2Router02(
-                sushiRouterAddress
-            );
-            address[] memory path = makePath(token);
-            uint256[] memory tokensNeeded = routerSushi.getAmountsIn(
-                carbonAmount,
-                path
-            );
-            // transfer tokens to this contract
-            IERC20(token).safeTransferFrom(
-                msg.sender,
-                address(this),
-                tokensNeeded[0]
-            );
-            // approve tokens for sushiRouter
-            IERC20(token).approve(sushiRouterAddress, tokensNeeded[0]);
-            // swap
-            routerSushi.swapTokensForExactTokens(
-                carbonAmount,
-                tokensNeeded[0],
-                path,
-                address(this),
-                block.timestamp
-            );
+        if (fromToken != NCTAddress) {
+            swapTokenToCarbonToken(fromToken, carbonAmount);
         } else {
             // For NCT tokens. Transfer NCT tokens.
-            IERC20(token).safeTransferFrom(
+            IERC20(fromToken).safeTransferFrom(
                 msg.sender,
                 address(this),
                 carbonAmount
@@ -122,7 +104,10 @@ contract Pooling {
 
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
 
-        uint256[] memory tokenAmountNeeded = sushiRouter.getAmountsIn(carbonAmount, path);
+        uint256[] memory tokenAmountNeeded = sushiRouter.getAmountsIn(
+            carbonAmount,
+            path
+        );
 
         return tokenAmountNeeded[0];
     }
@@ -175,6 +160,33 @@ contract Pooling {
         }(carbonAmount, path, address(this), block.timestamp);
 
         return amountUsed;
+    }
+
+    function swapTokenToCarbonToken(address fromToken, uint256 carbonAmount)
+        private
+    {
+        IUniswapV2Router02 routerSushi = IUniswapV2Router02(sushiRouterAddress);
+        address[] memory path = makePath(fromToken);
+        uint256[] memory tokensNeeded = routerSushi.getAmountsIn(
+            carbonAmount,
+            path
+        );
+        // transfer tokens to this contract
+        IERC20(fromToken).safeTransferFrom(
+            msg.sender,
+            address(this),
+            tokensNeeded[0]
+        );
+        // approve tokens for sushiRouter
+        IERC20(fromToken).approve(sushiRouterAddress, tokensNeeded[0]);
+        // swap
+        routerSushi.swapTokensForExactTokens(
+            carbonAmount,
+            tokensNeeded[0],
+            path,
+            address(this),
+            block.timestamp
+        );
     }
 
     function doAccounting(uint256 carbonAmount) private {
