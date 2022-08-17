@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.9;
 
-/// @title disCarbon Devcon 6 attendee pooling contract
-/// @author haurog, danceratopz
-/// @notice This contract exchanges the coins/tokens of the users for carbon tokens (NCT) and sends them to the pooling address.
-
-// Import this file to use console.log
 import "hardhat/console.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
+/// @title disCarbon Devcon 6 attendee pooling contract
+/// @author haurog, danceratopz
+/// @notice This contract exchanges the coins/tokens of the users for carbon tokens (NCT) and sends them to the pooling address.
 
 contract Pooling {
     using SafeERC20 for IERC20;
@@ -18,7 +17,7 @@ contract Pooling {
 
     uint256 public totalCarbonPooled = 0;
 
-    address public poolingAddress = 0x967AF011954F71835167e88b61226B96CD558896; // discarbon controlled address (for testing purposes)
+    address public poolingAddress = 0x967AF011954F71835167e88b61226B96CD558896; // disCarbon controlled address (for testing purposes)
 
     address private sushiRouterAddress =
         0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
@@ -28,11 +27,14 @@ contract Pooling {
 
     event ContributionSent(string tokenOrCoin, uint256 carbonTokenContributed);
 
-    // needed, otherwise uniswap router for matic fails
+    ///@dev Needed, otherwise uniswap router for matic fails
     receive() external payable {}
 
+    ///@dev Needed, otherwise uniswap router for matic fails
     fallback() external payable {}
 
+    /// @notice Receives Matic, swaps to carbon token and forwards the swapped tokens. Returns any excess Matic.
+    /// @param carbonAmount The number of carbon tokens that need to be forwarded.
     function participateWithMatic(uint256 carbonAmount) public payable {
         address[] memory path = makePath(WMATICAddress);
 
@@ -49,7 +51,9 @@ contract Pooling {
         emit ContributionSent("Matic", carbonAmount);
     }
 
-    // handles every ERC-20
+    /// @notice Takes user approved token, swaps to carbon token and forwards the swapped tokens. Only takes as much tokens as needed.
+    /// @param token Address of the token that should be used to participate.
+    /// @param carbonAmount The number of carbon tokens that need to be forwarded.
     function participateWithToken(address token, uint256 carbonAmount) public {
         // Skip swap if NCT is supplied
         if (token != NCTAddress) {
@@ -78,7 +82,7 @@ contract Pooling {
                 block.timestamp
             );
         } else {
-            // for NCT tokens
+            // For NCT tokens. Transfer NCT tokens.
             IERC20(token).safeTransferFrom(
                 msg.sender,
                 address(this),
@@ -91,7 +95,7 @@ contract Pooling {
         emit ContributionSent("Token", carbonAmount);
     }
 
-    // returns the needed amount of coins/tokens
+    ///@notice returns the needed amount of coins/tokens
     function calculateNeededAmount(address fromToken, uint256 amount)
         public
         view
@@ -113,7 +117,7 @@ contract Pooling {
 
     /// @notice This function creates a path from the initial token to the final token.
     /// It always goes through USDC. So make sure there is actually liquidity on sushiswap for your token path.
-    /// @return an array (can be empty) with all addresses which contributed.
+    /// @return path An array (can be empty) with all addresses which contributed.
     function makePath(address fromToken)
         private
         view
@@ -173,13 +177,13 @@ contract Pooling {
     }
 
     /// @notice A getter function for the array with all the contributors addresses.
-    /// @return an array (can be empty) with all addresses which contributed.
+    /// @return contributorsAddresses An array (can be empty) with all addresses which contributed.
     function getContributorsAddresses() public view returns (address[] memory) {
         return contributorsAddresses;
     }
 
     /// @notice A function to get the number of contributors.
-    /// @return a number which is the length of the contributorsAddresses array.
+    /// @return uint256 A number which is the length of the contributorsAddresses array.
     function getContributorsCount() public view returns (uint256) {
         return contributorsAddresses.length;
     }
