@@ -43,7 +43,7 @@ contract Pooling {
     function participateWithMatic(uint256 carbonAmount) public payable {
         address[] memory path = makePath(WMATICAddress);
 
-        uint256[] memory amountUsed = swapToCarbonToken(carbonAmount, path);
+        uint256[] memory amountUsed = swapMaticToCarbonToken(carbonAmount, path);
 
         require(
             carbonAmount == amountUsed[2],
@@ -155,7 +155,7 @@ contract Pooling {
 
     /// @notice Does the swap for Matic token.
     /// @return amountUsed An array with token amounts used along the path.
-    function swapToCarbonToken(uint256 carbonAmount, address[] memory path)
+    function swapMaticToCarbonToken(uint256 carbonAmount, address[] memory path)
         private
         returns (uint256[] memory)
     {
