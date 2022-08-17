@@ -10,16 +10,18 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 /// @notice This contract exchanges the coins/tokens of the users for carbon
 ///         tokens (NCT) and sends them to the pooling address. This contract
 ///         never owns any coins or tokens as all transactions happen instantly
-///         in a block and are forwarded in the same transaction.
+///         and are forwarded in the same transaction.
 
 contract Pooling {
     using SafeERC20 for IERC20;
 
+    /// @notice Stores all contributions (summed up) for each address
     mapping(address => uint256) public contributions;
+    /// @notice An array of addresses which have contributed
     address[] public contributorsAddresses;
-
+    /// @notice Sum of all contributions
     uint256 public totalCarbonPooled = 0;
-
+    /// @notice Address to where all the contributions are sent to (to be offset manually later)
     address public poolingAddress = 0x967AF011954F71835167e88b61226B96CD558896; // disCarbon controlled address (for testing purposes)
 
     address private sushiRouterAddress =
@@ -41,7 +43,6 @@ contract Pooling {
     ///         tokens. Returns any excess Matic.
     /// @param carbonAmount The number of carbon tokens that need to be forwarded.
     function participateWithMatic(uint256 carbonAmount) public payable {
-
         swapMaticToCarbonToken(carbonAmount);
         doAccounting(carbonAmount);
         forwardCarbonTokenToPool(carbonAmount);
@@ -129,13 +130,9 @@ contract Pooling {
     }
 
     /// @notice Does the swap for Matic coins.
-    function swapMaticToCarbonToken(uint256 carbonAmount)
-        private
-    {
-
+    function swapMaticToCarbonToken(uint256 carbonAmount) private {
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
         address[] memory path = makePath(WMATICAddress);
-
 
         uint256[] memory tokenToSwap = sushiRouter.getAmountsIn(
             carbonAmount,
@@ -154,7 +151,7 @@ contract Pooling {
         );
     }
 
-    /// @notice Does the swap for all tokens.
+    /// @notice Does the swap for all ERC-20 tokens.
     /// @param fromToken Address of the token one wants to swap to carbon tokens.
     /// @param carbonAmount Amount of carbon tokens one needs.
     function swapTokenToCarbonToken(address fromToken, uint256 carbonAmount)

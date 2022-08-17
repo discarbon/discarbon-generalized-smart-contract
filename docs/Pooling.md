@@ -4,7 +4,7 @@
 
 > disCarbon Devcon 6 attendee pooling contract
 
-This contract exchanges the coins/tokens of the users for carbon         tokens (NCT) and sends them to the pooling address. This contract         never owns any coins or tokens as all transactions happen instantly         in a block and are forwarded in the same transaction.
+This contract exchanges the coins/tokens of the users for carbon         tokens (NCT) and sends them to the pooling address. This contract         never owns any coins or tokens as all transactions happen instantly         and are forwarded in the same transaction.
 
 
 
@@ -39,7 +39,7 @@ returns the needed amount of coins/tokens.         the swapped tokens. Only take
 function contributions(address) external view returns (uint256)
 ```
 
-
+Stores all contributions (summed up) for each address
 
 
 
@@ -61,7 +61,7 @@ function contributions(address) external view returns (uint256)
 function contributorsAddresses(uint256) external view returns (address)
 ```
 
-
+An array of addresses which have contributed
 
 
 
@@ -150,7 +150,7 @@ Takes user approved token, swaps to carbon token and forwards         the swappe
 function poolingAddress() external view returns (address)
 ```
 
-
+Address to where all the contributions are sent to (to be offset manually later)
 
 
 
@@ -167,7 +167,7 @@ function poolingAddress() external view returns (address)
 function totalCarbonPooled() external view returns (uint256)
 ```
 
-
+Sum of all contributions
 
 
 
