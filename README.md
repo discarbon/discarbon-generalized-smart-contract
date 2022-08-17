@@ -8,6 +8,8 @@ This smart contract has the following tasks:
 3. Forward carbon token to a preprogrammed wallet address.
 4. Store the attendee address and offset amount to issue a POAP.
 
+A more detailed descirption of the methods in the contract can be found in the
+[automatically generated documentation](docs/Pooling.md).
 
 ## How to get started
 
