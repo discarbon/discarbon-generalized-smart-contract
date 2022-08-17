@@ -131,6 +131,8 @@ contract Pooling {
     ///         token. It always routes the swaps through USDC (Token > USDC > NCT).
     ///         So make sure there is actually liquidity on sushiswap for your token
     ///         for this path.
+    /// @param fromToken Address of the token that should be used to participate.
+    ///        To estimate Matic tokens, use WMATIC address.
     /// @return path An array with the path for the sushiswap router to do the swap.
     function makePath(address fromToken)
         private
