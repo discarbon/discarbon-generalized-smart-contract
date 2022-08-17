@@ -7,7 +7,10 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// @title disCarbon Devcon 6 attendee pooling contract
 /// @author haurog, danceratopz
-/// @notice This contract exchanges the coins/tokens of the users for carbon tokens (NCT) and sends them to the pooling address.
+/// @notice This contract exchanges the coins/tokens of the users for carbon
+///         tokens (NCT) and sends them to the pooling address. This contract
+///         never owns any coins or tokens as all transactions happen instantly
+///         in a block and are forwarded in the same transaction.
 
 contract Pooling {
     using SafeERC20 for IERC20;
@@ -25,6 +28,7 @@ contract Pooling {
     address private WMATICAddress = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
     address private USDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
+    ///@notice Emitted after carbon tokens have been sent to pooling address.
     event ContributionSent(string tokenOrCoin, uint256 carbonTokenContributed);
 
     ///@dev Needed, otherwise uniswap router for matic fails
@@ -33,7 +37,8 @@ contract Pooling {
     ///@dev Needed, otherwise uniswap router for matic fails
     fallback() external payable {}
 
-    /// @notice Receives Matic, swaps to carbon token and forwards the swapped tokens. Returns any excess Matic.
+    /// @notice Receives Matic, swaps to carbon token and forwards the swapped
+    ///         tokens. Returns any excess Matic.
     /// @param carbonAmount The number of carbon tokens that need to be forwarded.
     function participateWithMatic(uint256 carbonAmount) public payable {
         address[] memory path = makePath(WMATICAddress);
@@ -51,7 +56,8 @@ contract Pooling {
         emit ContributionSent("Matic", carbonAmount);
     }
 
-    /// @notice Takes user approved token, swaps to carbon token and forwards the swapped tokens. Only takes as much tokens as needed.
+    /// @notice Takes user approved token, swaps to carbon token and forwards
+    ///         the swapped tokens. Only takes as many tokens as needed.
     /// @param token Address of the token that should be used to participate.
     /// @param carbonAmount The number of carbon tokens that need to be forwarded.
     function participateWithToken(address token, uint256 carbonAmount) public {
@@ -95,7 +101,13 @@ contract Pooling {
         emit ContributionSent("Token", carbonAmount);
     }
 
-    ///@notice returns the needed amount of coins/tokens
+    ///@notice returns the needed amount of coins/tokens.
+    ///         the swapped tokens. Only takes as many tokens as needed.
+    /// @param fromToken Address of the token that should be used to participate.
+    ///        To estimate Matic tokens, use WMATIC address.
+    /// @param amount Carbon Amount that needs to be purchased.
+    /// @return amountNeeded How many tokens/coins needed for buying the needed
+    ///         carbon tokens.
     function calculateNeededAmount(address fromToken, uint256 amount)
         public
         view
@@ -115,9 +127,11 @@ contract Pooling {
         return amountNeeded[0];
     }
 
-    /// @notice This function creates a path from the initial token to the final token.
-    /// It always goes through USDC. So make sure there is actually liquidity on sushiswap for your token path.
-    /// @return path An array (can be empty) with all addresses which contributed.
+    /// @notice This function creates a path from the initial token to the final
+    ///         token. It always routes the swaps through USDC (Token > USDC > NCT).
+    ///         So make sure there is actually liquidity on sushiswap for your token
+    ///         for this path.
+    /// @return path An array with the path for the sushiswap router to do the swap.
     function makePath(address fromToken)
         private
         view
@@ -137,6 +151,8 @@ contract Pooling {
         }
     }
 
+    /// @notice Does the swap for Matic token.
+    /// @return amountUsed An array with token amounts used along the path.
     function swapToCarbonToken(uint256 carbonAmount, address[] memory path)
         private
         returns (uint256[] memory)

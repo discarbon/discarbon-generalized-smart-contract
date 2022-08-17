@@ -4,7 +4,7 @@
 
 > disCarbon Devcon 6 attendee pooling contract
 
-This contract exchanges the coins/tokens of the users for carbon tokens (NCT) and sends them to the pooling address.
+This contract exchanges the coins/tokens of the users for carbon         tokens (NCT) and sends them to the pooling address. This contract         never owns any coins or tokens as all transactions happen instantly         in a block and are forwarded in the same transaction.
 
 
 
@@ -16,7 +16,7 @@ This contract exchanges the coins/tokens of the users for carbon tokens (NCT) an
 function calculateNeededAmount(address fromToken, uint256 amount) external view returns (uint256)
 ```
 
-returns the needed amount of coins/tokens
+returns the needed amount of coins/tokens.         the swapped tokens. Only takes as many tokens as needed.
 
 
 
@@ -24,14 +24,14 @@ returns the needed amount of coins/tokens
 
 | Name | Type | Description |
 |---|---|---|
-| fromToken | address | undefined |
-| amount | uint256 | undefined |
+| fromToken | address | Address of the token that should be used to participate.        To estimate Matic tokens, use WMATIC address. |
+| amount | uint256 | Carbon Amount that needs to be purchased. |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | amountNeeded How many tokens/coins needed for buying the needed         carbon tokens. |
 
 ### contributions
 
@@ -117,7 +117,7 @@ A function to get the number of contributors.
 function participateWithMatic(uint256 carbonAmount) external payable
 ```
 
-Receives Matic, swaps to carbon token and forwards the swapped tokens. Returns any excess Matic.
+Receives Matic, swaps to carbon token and forwards the swapped         tokens. Returns any excess Matic.
 
 
 
@@ -133,7 +133,7 @@ Receives Matic, swaps to carbon token and forwards the swapped tokens. Returns a
 function participateWithToken(address token, uint256 carbonAmount) external nonpayable
 ```
 
-Takes user approved token, swaps to carbon token and forwards the swapped tokens. Only takes as much tokens as needed.
+Takes user approved token, swaps to carbon token and forwards         the swapped tokens. Only takes as many tokens as needed.
 
 
 
@@ -188,7 +188,7 @@ function totalCarbonPooled() external view returns (uint256)
 event ContributionSent(string tokenOrCoin, uint256 carbonTokenContributed)
 ```
 
-
+Emitted after carbon tokens have been sent to pooling address.
 
 
 
