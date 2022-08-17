@@ -43,16 +43,7 @@ contract Pooling {
     function participateWithMatic(uint256 carbonAmount) public payable {
         address[] memory path = makePath(WMATICAddress);
 
-        uint256[] memory amountUsed = swapMaticToCarbonToken(
-            carbonAmount,
-            path
-        );
-
-        require(
-            carbonAmount == amountUsed[2],
-            "Not received enough carbon Tokens"
-        );
-
+        swapMaticToCarbonToken(carbonAmount, path);
         doAccounting(carbonAmount);
         forwardCarbonTokenToPool(carbonAmount);
         returnExcessMatic();
@@ -138,11 +129,9 @@ contract Pooling {
         }
     }
 
-    /// @notice Does the swap for Matic token.
-    /// @return amountUsed An array with token amounts used along the path.
+    /// @notice Does the swap for Matic coins.
     function swapMaticToCarbonToken(uint256 carbonAmount, address[] memory path)
         private
-        returns (uint256[] memory)
     {
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
 
@@ -155,13 +144,17 @@ contract Pooling {
             "Not enough Matic to swap to required carbon Token"
         );
 
-        uint256[] memory amountUsed = sushiRouter.swapETHForExactTokens{
-            value: msg.value
-        }(carbonAmount, path, address(this), block.timestamp);
-
-        return amountUsed;
+        sushiRouter.swapETHForExactTokens{value: msg.value}(
+            carbonAmount,
+            path,
+            address(this),
+            block.timestamp
+        );
     }
 
+    /// @notice Does the swap for all tokens.
+    /// @param fromToken Address of the token one wants to swap to carbon tokens.
+    /// @param carbonAmount Amount of carbon tokens one needs.
     function swapTokenToCarbonToken(address fromToken, uint256 carbonAmount)
         private
     {
@@ -189,6 +182,8 @@ contract Pooling {
         );
     }
 
+    /// @notice Does the accounting (storing addresses and values contributed).
+    /// @param carbonAmount Amount of carbon tokens contributed.
     function doAccounting(uint256 carbonAmount) private {
         totalCarbonPooled += carbonAmount;
         if (contributions[msg.sender] == 0) {
@@ -197,11 +192,13 @@ contract Pooling {
         contributions[msg.sender] += carbonAmount;
     }
 
+    /// @notice Returns excess matic not used in the swap.
     function returnExcessMatic() private {
         (bool success, ) = msg.sender.call{value: address(this).balance}("");
         require(success, "refund failed");
     }
 
+    /// @notice Forwards the carbon tokens to the pooling Address.
     function forwardCarbonTokenToPool(uint256 carbonAmount) private {
         IERC20(NCTAddress).transfer(poolingAddress, carbonAmount);
     }
