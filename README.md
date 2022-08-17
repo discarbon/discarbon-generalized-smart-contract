@@ -25,8 +25,28 @@ Fork the polygon mainnet
 
 Deploy the pooling contract with:
 
-`hh run scripts/deploy_pooling.js`
+`hh run scripts/deploy.js`
 
+
+## Tests
+
+Run tests using:
+
+`hh test`
+
+You can also run a forked chain locally and then deploy test on it by running:
+
+`hh node`
+
+in the first terminal window and:
+
+`hh test --network localhost`
+
+in the second terminal window to run the tests.
+
+You can also locally deploy the contracts manually using:
+
+`hh run scripts/deploy.js --network localhost`
 
 ## hardhat sample project readme
 
