@@ -103,6 +103,18 @@ contract Pooling {
         return tokenAmountNeeded[0];
     }
 
+    /// @notice A getter function for the array with all the contributors addresses.
+    /// @return contributorsAddresses An array (can be empty) with all addresses which contributed.
+    function getContributorsAddresses() public view returns (address[] memory) {
+        return contributorsAddresses;
+    }
+
+    /// @notice A function to get the number of contributors.
+    /// @return uint256 A number which is the length of the contributorsAddresses array.
+    function getContributorsCount() public view returns (uint256) {
+        return contributorsAddresses.length;
+    }
+
     /// @notice This function creates a path from the initial token to the final
     ///         token. It always routes the swaps through USDC (Token > USDC > NCT).
     ///         So make sure there is actually liquidity on sushiswap for your token
@@ -200,17 +212,5 @@ contract Pooling {
     /// @notice Forwards the carbon tokens to the pooling Address.
     function forwardCarbonTokenToPool(uint256 carbonAmount) private {
         IERC20(NCTAddress).transfer(poolingAddress, carbonAmount);
-    }
-
-    /// @notice A getter function for the array with all the contributors addresses.
-    /// @return contributorsAddresses An array (can be empty) with all addresses which contributed.
-    function getContributorsAddresses() public view returns (address[] memory) {
-        return contributorsAddresses;
-    }
-
-    /// @notice A function to get the number of contributors.
-    /// @return uint256 A number which is the length of the contributorsAddresses array.
-    function getContributorsCount() public view returns (uint256) {
-        return contributorsAddresses.length;
     }
 }
