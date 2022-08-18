@@ -11,6 +11,8 @@ This smart contract has the following tasks:
 A more detailed descirption of the methods in the contract can be found in the
 [automatically generated documentation](docs/Pooling.md).
 
+The contract is deployed on the polygon mainnet: [0x2608cDFCAe67d96A120bba7407d75c1F871221f6](https://polygonscan.com/address/0x2608cDFCAe67d96A120bba7407d75c1F871221f6)
+
 ## How to get started
 
 Install all dependencies
@@ -49,6 +51,18 @@ in the second terminal window to run the tests.
 You can also locally deploy the contracts manually using:
 
 `hh run scripts/deploy.js --network localhost`
+
+
+
+## Deploy
+
+Manual deployment can be done by first:
+
+`hh run scripts/deploy.js --network polygon`
+
+and then verify the contract:
+
+`hh verify 0x2608cDFCAe67d96A120bba7407d75c1F871221f6 --network polygon`
 
 ## hardhat sample project readme
 
