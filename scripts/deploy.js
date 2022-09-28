@@ -7,7 +7,7 @@
 const hre = require("hardhat");
 
 async function main() {
-  const Pooling = await hre.ethers.getContractFactory("Pooling");
+  const Pooling = await hre.ethers.getContractFactory("Devcon_Offset_Pool");
   const pooling = await Pooling.deploy();
 
   await pooling.deployed();

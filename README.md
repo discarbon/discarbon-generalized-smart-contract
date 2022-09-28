@@ -9,7 +9,7 @@ This smart contract has the following tasks:
 4. Store the attendee address and offset amount to issue a POAP.
 
 A more detailed descirption of the methods in the contract can be found in the
-[automatically generated documentation](docs/Pooling.md).
+[automatically generated documentation](docs/Devcon_Offset_Pool.md).
 
 The contract is deployed on the polygon mainnet: [0x2608cDFCAe67d96A120bba7407d75c1F871221f6](https://polygonscan.com/address/0x2608cDFCAe67d96A120bba7407d75c1F871221f6)
 

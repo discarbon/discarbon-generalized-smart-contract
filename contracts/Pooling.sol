@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 ///         never owns any coins or tokens as all transactions happen instantly
 ///         and are forwarded in the same transaction.
 
-contract Pooling {
+contract Devcon_Offset_Pool {
     using SafeERC20 for IERC20;
 
     /// @notice Stores all contributions (summed up) for each address

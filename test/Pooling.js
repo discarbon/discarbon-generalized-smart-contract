@@ -28,7 +28,7 @@ describe("Pooling", function () {
     // Contracts are deployed using the first signer/account by default
     const [deployer, otherAccount] = await ethers.getSigners();
 
-    const Pooling = await ethers.getContractFactory("Pooling");
+    const Pooling = await ethers.getContractFactory("Devcon_Offset_Pool");
     const pooling = await Pooling.deploy();
 
     // console.log("deployer: ", deployer.address)
