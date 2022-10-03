@@ -22,7 +22,6 @@ contract Devcon_Offset_Pool {
     uint256 public totalCarbonPooled = 0;
     /// @notice Address to where all the contributions are sent to (to be offset manually later)
     address public poolingAddress = 0x439d22a39cD2d0f0572ed05D3c5081d6117B8031; // Devcon VI multisig
-    // address public poolingAddress = 0x967AF011954F71835167e88b61226B96CD558896; // disCarbon controlled address (for testing purposes)
 
     address private sushiRouterAddress =
         0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
