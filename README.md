@@ -11,7 +11,7 @@ This smart contract has the following tasks:
 A more detailed descirption of the methods in the contract can be found in the
 [automatically generated documentation](docs/Devcon_Offset_Pool.md).
 
-The contract is deployed on the polygon mainnet: [0x2608cDFCAe67d96A120bba7407d75c1F871221f6](https://polygonscan.com/address/0x2608cDFCAe67d96A120bba7407d75c1F871221f6)
+The contract is deployed on the polygon mainnet: [0xb6A5D547d0A325Ffa0357E2698eB76E165b606BA](https://polygonscan.com/address/0xb6A5D547d0A325Ffa0357E2698eB76E165b606BA)
 
 ## How to get started
 
@@ -62,7 +62,7 @@ Manual deployment can be done by first:
 
 and then verify the contract:
 
-`hh verify 0x2608cDFCAe67d96A120bba7407d75c1F871221f6 --network polygon`
+`hh verify 0xb6A5D547d0A325Ffa0357E2698eB76E165b606BA --network polygon`
 
 ## hardhat sample project readme
 
