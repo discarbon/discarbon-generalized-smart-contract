@@ -1,17 +1,19 @@
-# discarbon-devcon-attendee-contract
-This the smart contract for the devcon attendees to buy carbon tokens and send them to a wallet.
+# discarbon-generalized-smart-contract
+This the smart contract to swap and retire carbon tokens.
 
-This smart contract has the following tasks:
+This smart contract is planned to do the following tasks:
 
-1. Receive/Get coins/tokens from attendee.
+1. Receive/Get coins/tokens from the user.
 2. Exchange for carbon token (NCT) on sushiswap.
-3. Forward carbon token to a preprogrammed wallet address.
-4. Store the attendee address and offset amount to issue a POAP.
+3. Swap for TCO2 token from a project (default or user selectd).
+4. Retire TCO2s.
+5. Store the attendee address and offset amount.
+6. Claim the NFT from Toucan
 
-A more detailed descirption of the methods in the contract can be found in the
+A more detailed description of the methods in the contract can be found in the
 [automatically generated documentation](docs/Devcon_Offset_Pool.md).
 
-The contract is deployed on the polygon mainnet: [0xb6A5D547d0A325Ffa0357E2698eB76E165b606BA](https://polygonscan.com/address/0xb6A5D547d0A325Ffa0357E2698eB76E165b606BA)
+The contract is not yet deployed:
 
 ## How to get started
 
@@ -63,17 +65,3 @@ Manual deployment can be done by first:
 and then verify the contract:
 
 `hh verify 0xb6A5D547d0A325Ffa0357E2698eB76E165b606BA --network polygon`
-
-## hardhat sample project readme
-
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
