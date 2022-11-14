@@ -7,12 +7,12 @@
 const hre = require("hardhat");
 
 async function main() {
-  const Pooling = await hre.ethers.getContractFactory("Devcon_Offset_Pool");
-  const pooling = await Pooling.deploy();
+  const disCarbonSwapAndRetire = await hre.ethers.getContractFactory("disCarbonSwapAndRetire");
+  const retireContract = await disCarbonSwapAndRetire.deploy();
 
   await pooling.deployed();
 
-  console.log("Pooling deployed:", pooling.address);
+  console.log("Pooling deployed:", retireContract.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -11,7 +11,7 @@ This smart contract is planned to do the following tasks:
 6. Claim the NFT from Toucan
 
 A more detailed description of the methods in the contract can be found in the
-[automatically generated documentation](docs/Devcon_Offset_Pool.md).
+[automatically generated documentation](docs/disCarbonSwapAndRetire.md).
 
 The contract is not yet deployed:
 

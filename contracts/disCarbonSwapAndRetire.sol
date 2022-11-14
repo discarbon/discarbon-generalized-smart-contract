@@ -4,14 +4,14 @@ pragma solidity ^0.8.9;
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-/// @title disCarbon Devcon 6 attendee pooling contract
+/// @title disCarbon generalized swap and retire contract
 /// @author haurog, danceratopz
 /// @notice This contract exchanges the coins/tokens of the users for carbon
-///         tokens (NCT) and sends them to the pooling address. This contract
-///         never owns any coins or tokens as all transactions happen instantly
-///         and are forwarded in the same transaction.
+///         tokens (NCT) and redeems them for an underlying project token and
+///         retires them. It also keeps track on the cumulative retirements of
+///         each address.
 
-contract Devcon_Offset_Pool {
+contract disCarbonSwapAndRetire {
     using SafeERC20 for IERC20;
 
     /// @notice Stores all contributions (summed up) for each address
