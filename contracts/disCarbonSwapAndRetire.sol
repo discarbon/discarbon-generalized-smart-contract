@@ -208,7 +208,7 @@ contract disCarbonSwapAndRetire {
         require(success, "refund failed");
     }
 
-    /// @notice Forwards the carbon tokens to the pooling Address.
+    /// @notice Forwards the donation to the disCarbon multisig.
     function forwardDonation(uint256 carbonAmount) private {
         IERC20(NCTAddress).transfer(donationAddress, carbonAmount);
     }
