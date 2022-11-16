@@ -74,8 +74,8 @@ contract disCarbonSwapAndRetire {
         emit ContributionSent("Token", carbonAmount);
     }
 
-    ///@notice returns the needed amount of coins/tokens.
-    ///         the swapped tokens. Only takes as many tokens as needed.
+    ///@notice Calculates the needed amount of coins/tokens.
+    ///         the swapped tokens.
     /// @param fromToken Address of the token that is used to swap from.
     ///        To estimate Matic tokens, use WMATIC address.
     /// @param carbonAmount Carbon Amount that needs to be purchased.
