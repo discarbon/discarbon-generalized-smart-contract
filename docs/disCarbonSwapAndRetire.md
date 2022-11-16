@@ -16,7 +16,7 @@ This contract exchanges the coins/tokens of the user for carbon         tokens (
 function calculateNeededAmount(address fromToken, uint256 carbonAmount) external view returns (uint256)
 ```
 
-returns the needed amount of coins/tokens.         the swapped tokens. Only takes as many tokens as needed.
+Calculates the needed amount of coins/tokens.         the swapped tokens.
 
 
 
