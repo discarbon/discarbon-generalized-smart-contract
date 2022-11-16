@@ -41,7 +41,7 @@ contract disCarbonSwapAndRetire {
     /// @notice Receives Matic, swaps to carbon token and forwards the swapped
     ///         tokens. Returns any excess Matic.
     /// @param carbonAmount The number of carbon tokens that need to be forwarded.
-    function participateWithMatic(uint256 carbonAmount) public payable {
+    function retireWithMatic(uint256 carbonAmount) public payable {
         swapMaticToCarbonToken(carbonAmount);
         doAccounting(carbonAmount);
         forwardDonation(carbonAmount);
@@ -51,9 +51,9 @@ contract disCarbonSwapAndRetire {
 
     /// @notice Takes user approved token, swaps to carbon token and forwards
     ///         the swapped tokens. Only takes as many tokens as needed.
-    /// @param fromToken Address of the token that should be used to participate.
+    /// @param fromToken Address of the token that is used to swap from.
     /// @param carbonAmount The number of carbon tokens that need to be forwarded.
-    function participateWithToken(address fromToken, uint256 carbonAmount)
+    function retireWithToken(address fromToken, uint256 carbonAmount)
         public
     {
         if (fromToken == NCTAddress) {
@@ -75,7 +75,7 @@ contract disCarbonSwapAndRetire {
 
     ///@notice returns the needed amount of coins/tokens.
     ///         the swapped tokens. Only takes as many tokens as needed.
-    /// @param fromToken Address of the token that should be used to participate.
+    /// @param fromToken Address of the token that is used to swap from.
     ///        To estimate Matic tokens, use WMATIC address.
     /// @param carbonAmount Carbon Amount that needs to be purchased.
     /// @return tokenAmountNeeded How many tokens/coins needed for buying the needed
@@ -118,7 +118,7 @@ contract disCarbonSwapAndRetire {
     ///         token. It always routes the swaps through USDC (Token > USDC > NCT).
     ///         So make sure there is actually liquidity on sushiswap for your token
     ///         for this path.
-    /// @param fromToken Address of the token that should be used to participate.
+    /// @param fromToken Address of the token that is used to swap from.
     ///        To estimate Matic tokens, use WMATIC address.
     /// @return path An array with the path for the sushiswap router to do the swap.
     function makePath(address fromToken)
@@ -163,7 +163,7 @@ contract disCarbonSwapAndRetire {
     }
 
     /// @notice Does the swap for all ERC-20 tokens.
-    /// @param fromToken Address of the token one wants to swap to carbon tokens.
+    /// @param fromToken Address of the token that is used to swap from
     /// @param carbonAmount Amount of carbon tokens one needs.
     function swapTokenToCarbonToken(address fromToken, uint256 carbonAmount)
         private

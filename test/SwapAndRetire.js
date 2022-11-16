@@ -40,7 +40,7 @@ describe("disCarbonSwapAndRetire", function () {
       expect(retireContract.address != constants.zeroAddress);
     });
   });
-  describe("Participation with MATIC", function () {
+  describe("Retire with MATIC", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
@@ -53,7 +53,7 @@ describe("disCarbonSwapAndRetire", function () {
       // Contribute from first address
       const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
 
-      await expect(retireContract.participateWithMatic(carbonToReceive1, { value: maticToSend1 }))
+      await expect(retireContract.retireWithMatic(carbonToReceive1, { value: maticToSend1 }))
         .to.emit(retireContract, "ContributionSent")
         .withArgs("Matic", carbonToReceive1);
 
@@ -70,7 +70,7 @@ describe("disCarbonSwapAndRetire", function () {
       expect(NCTBalanceChange).to.equal(carbonToReceive1);
 
       // Contribute from second address
-      await retireContract.connect(otherAccount).participateWithMatic(carbonToReceive2, { value: maticToSend2 });
+      await retireContract.connect(otherAccount).retireWithMatic(carbonToReceive2, { value: maticToSend2 });
       expect(await retireContract.contributorsAddresses(1)).to.equal(otherAccount.address);
       let contribution2 = await retireContract.contributions(otherAccount.address);
       expect(contribution2).to.equal(carbonToReceive2);
@@ -92,12 +92,12 @@ describe("disCarbonSwapAndRetire", function () {
 
       // Contribute from first address
       let maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToReceive);
-      await expect(retireContract.participateWithMatic(carbonToReceive, { value: maticEstimated })).not.to.be.reverted;
+      await expect(retireContract.retireWithMatic(carbonToReceive, { value: maticEstimated })).not.to.be.reverted;
 
       maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToReceive);
       let reducedMaticAmount = maticEstimated.sub(ethers.utils.parseEther("0.0000000001"));
 
-      await expect(retireContract.participateWithMatic(carbonToReceive, { value: reducedMaticAmount })).to.be.revertedWith("Not enough Matic to swap to required carbon Token");
+      await expect(retireContract.retireWithMatic(carbonToReceive, { value: reducedMaticAmount })).to.be.revertedWith("Not enough Matic to swap to required carbon Token");
 
       NCTBalanceAfter = await NCT.balanceOf(donationAddress);
       NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
@@ -105,7 +105,7 @@ describe("disCarbonSwapAndRetire", function () {
 
     });
   });
-  describe("Test participate with USDC", function () {
+  describe("Test retire with USDC", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
@@ -120,7 +120,7 @@ describe("disCarbonSwapAndRetire", function () {
       let USDCEstimated = await retireContract.calculateNeededAmount(USDCAddress, carbonToReceive);
       // console.log("USDC: ", USDCEstimated);
       await USDC.connect(deployer).approve(retireContract.address, USDCEstimated);
-      await expect(retireContract.participateWithToken(USDCAddress, carbonToReceive))
+      await expect(retireContract.retireWithToken(USDCAddress, carbonToReceive))
       .to.emit(retireContract, "ContributionSent")
       .withArgs("Token", carbonToReceive);
 
@@ -138,10 +138,10 @@ describe("disCarbonSwapAndRetire", function () {
       // Approve less than estimated and see that it fails
       USDCEstimated = await retireContract.calculateNeededAmount(USDCAddress, carbonToReceive);
       await USDC.connect(deployer).approve(retireContract.address, USDCEstimated.sub(1));
-      await expect(retireContract.participateWithToken(USDCAddress, carbonToReceive)).to.be.reverted;
+      await expect(retireContract.retireWithToken(USDCAddress, carbonToReceive)).to.be.reverted;
     });
   });
-  describe("Test participate with WMATIC", function () {
+  describe("Test retire with WMATIC", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
@@ -156,7 +156,7 @@ describe("disCarbonSwapAndRetire", function () {
       let WMATICEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToReceive);
       // console.log("WMATIC: ", WMATICEstimated);
       await WMATIC.connect(deployer).approve(retireContract.address, WMATICEstimated);
-      await expect(retireContract.participateWithToken(WMATICAddress, carbonToReceive))
+      await expect(retireContract.retireWithToken(WMATICAddress, carbonToReceive))
       .to.emit(retireContract, "ContributionSent")
       .withArgs("Token", carbonToReceive);
 
@@ -174,10 +174,10 @@ describe("disCarbonSwapAndRetire", function () {
       // Approve less than estimated and see that it fails
       WMATICEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToReceive);
       await WMATIC.connect(deployer).approve(retireContract.address, WMATICEstimated.sub(1));
-      await expect(retireContract.participateWithToken(WMATICAddress, carbonToReceive)).to.be.reverted;
+      await expect(retireContract.retireWithToken(WMATICAddress, carbonToReceive)).to.be.reverted;
     });
   });
-  describe("Test participate with DAI", function () {
+  describe("Test retire with DAI", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
@@ -192,7 +192,7 @@ describe("disCarbonSwapAndRetire", function () {
       let DAIEstimated = await retireContract.calculateNeededAmount(DAIAddress, carbonToReceive);
       // console.log("DAI: ", DAIEstimated);
       await DAI.connect(deployer).approve(retireContract.address, DAIEstimated);
-      await expect(retireContract.participateWithToken(DAIAddress, carbonToReceive))
+      await expect(retireContract.retireWithToken(DAIAddress, carbonToReceive))
       .to.emit(retireContract, "ContributionSent")
       .withArgs("Token", carbonToReceive);
 
@@ -210,10 +210,10 @@ describe("disCarbonSwapAndRetire", function () {
       // Approve less than estimated and see that it fails
       DAIEstimated = await retireContract.calculateNeededAmount(DAIAddress, carbonToReceive);
       await DAI.connect(deployer).approve(retireContract.address, DAIEstimated.sub(1));
-      await expect(retireContract.participateWithToken(DAIAddress, carbonToReceive)).to.be.reverted;
+      await expect(retireContract.retireWithToken(DAIAddress, carbonToReceive)).to.be.reverted;
     });
   });
-  describe("Test participate with WETH", function () {
+  describe("Test retire with WETH", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
@@ -228,7 +228,7 @@ describe("disCarbonSwapAndRetire", function () {
       let WETHEstimated = await retireContract.calculateNeededAmount(WETHAddress, carbonToReceive);
       // console.log("WETH: ", WETHEstimated);
       await WETH.connect(deployer).approve(retireContract.address, WETHEstimated);
-      await expect(retireContract.participateWithToken(WETHAddress, carbonToReceive))
+      await expect(retireContract.retireWithToken(WETHAddress, carbonToReceive))
       .to.emit(retireContract, "ContributionSent")
       .withArgs("Token", carbonToReceive);
 
@@ -246,10 +246,10 @@ describe("disCarbonSwapAndRetire", function () {
       // Approve less than estimated and see that it fails
       WETHEstimated = await retireContract.calculateNeededAmount(WETHAddress, carbonToReceive);
       await WETH.connect(deployer).approve(retireContract.address, WETHEstimated.sub(1));
-      await expect(retireContract.participateWithToken(WETHAddress, carbonToReceive)).to.be.reverted;
+      await expect(retireContract.retireWithToken(WETHAddress, carbonToReceive)).to.be.reverted;
     });
   });
-  describe("Test participate with NCT", function () {
+  describe("Test retire with NCT", function () {
     it("Should record the address, pooled amount and forward the tokens", async function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
@@ -263,7 +263,7 @@ describe("disCarbonSwapAndRetire", function () {
       let NCTEstimated = await retireContract.calculateNeededAmount(NCTAddress, carbonToReceive);
       // console.log("NCT: ", NCTEstimated);
       await NCT.connect(deployer).approve(retireContract.address, NCTEstimated);
-      await expect(retireContract.participateWithToken(NCTAddress, carbonToReceive))
+      await expect(retireContract.retireWithToken(NCTAddress, carbonToReceive))
       .to.emit(retireContract, "ContributionSent")
       .withArgs("Token", carbonToReceive);
 
@@ -283,7 +283,7 @@ describe("disCarbonSwapAndRetire", function () {
       // console.log("NCT: ", NCTEstimated);
 
       await NCT.connect(deployer).approve(retireContract.address, NCTEstimated.sub(1));
-      await expect(retireContract.participateWithToken(NCTAddress, carbonToReceive)).to.be.reverted;
+      await expect(retireContract.retireWithToken(NCTAddress, carbonToReceive)).to.be.reverted;
     });
   });
 })

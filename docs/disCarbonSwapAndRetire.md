@@ -24,7 +24,7 @@ returns the needed amount of coins/tokens.         the swapped tokens. Only take
 
 | Name | Type | Description |
 |---|---|---|
-| fromToken | address | Address of the token that should be used to participate.        To estimate Matic tokens, use WMATIC address. |
+| fromToken | address | Address of the token that is used to swap from.        To estimate Matic tokens, use WMATIC address. |
 | carbonAmount | uint256 | Carbon Amount that needs to be purchased. |
 
 #### Returns
@@ -128,10 +128,10 @@ A function to get the number of contributors.
 |---|---|---|
 | _0 | uint256 | uint256 A number which is the length of the contributorsAddresses array. |
 
-### participateWithMatic
+### retireWithMatic
 
 ```solidity
-function participateWithMatic(uint256 carbonAmount) external payable
+function retireWithMatic(uint256 carbonAmount) external payable
 ```
 
 Receives Matic, swaps to carbon token and forwards the swapped         tokens. Returns any excess Matic.
@@ -144,10 +144,10 @@ Receives Matic, swaps to carbon token and forwards the swapped         tokens. R
 |---|---|---|
 | carbonAmount | uint256 | The number of carbon tokens that need to be forwarded. |
 
-### participateWithToken
+### retireWithToken
 
 ```solidity
-function participateWithToken(address fromToken, uint256 carbonAmount) external nonpayable
+function retireWithToken(address fromToken, uint256 carbonAmount) external nonpayable
 ```
 
 Takes user approved token, swaps to carbon token and forwards         the swapped tokens. Only takes as many tokens as needed.
@@ -158,7 +158,7 @@ Takes user approved token, swaps to carbon token and forwards         the swappe
 
 | Name | Type | Description |
 |---|---|---|
-| fromToken | address | Address of the token that should be used to participate. |
+| fromToken | address | Address of the token that is used to swap from. |
 | carbonAmount | uint256 | The number of carbon tokens that need to be forwarded. |
 
 ### totalCarbonPooled
