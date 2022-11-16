@@ -4,7 +4,7 @@
 
 > disCarbon generalized swap and retire contract
 
-This contract exchanges the coins/tokens of the users for carbon         tokens (NCT) and redeems them for an underlying project token and         retires them. It also keeps track on the cumulative retirements of         each address.
+This contract exchanges the coins/tokens of the user for carbon         tokens (NCT) and redeems them for an underlying project token and         retires them. It also keeps track on the cumulative retirements of         each address.
 
 
 
@@ -70,6 +70,23 @@ An array of addresses which have contributed
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+
+### donationAddress
+
+```solidity
+function donationAddress() external view returns (address)
+```
+
+Address to where the donations are sent to
+
+
+
 
 #### Returns
 
@@ -143,23 +160,6 @@ Takes user approved token, swaps to carbon token and forwards         the swappe
 |---|---|---|
 | fromToken | address | Address of the token that should be used to participate. |
 | carbonAmount | uint256 | The number of carbon tokens that need to be forwarded. |
-
-### poolingAddress
-
-```solidity
-function poolingAddress() external view returns (address)
-```
-
-Address to where all the contributions are sent to (to be offset manually later)
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
 
 ### totalCarbonPooled
 

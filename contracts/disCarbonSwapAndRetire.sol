@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// @title disCarbon generalized swap and retire contract
 /// @author haurog, danceratopz
-/// @notice This contract exchanges the coins/tokens of the users for carbon
+/// @notice This contract exchanges the coins/tokens of the user for carbon
 ///         tokens (NCT) and redeems them for an underlying project token and
 ///         retires them. It also keeps track on the cumulative retirements of
 ///         each address.
@@ -20,8 +20,8 @@ contract disCarbonSwapAndRetire {
     address[] public contributorsAddresses;
     /// @notice Sum of all contributions
     uint256 public totalCarbonPooled = 0;
-    /// @notice Address to where all the contributions are sent to (to be offset manually later)
-    address public poolingAddress = 0x439d22a39cD2d0f0572ed05D3c5081d6117B8031; // Devcon VI multisig
+    /// @notice Address to where the donations are sent to
+    address public donationAddress = 0xCFA521D5514dDf8334f3907dcFe99752D51580E9; // disCarbon Polygon Safe Multisig
 
     address private sushiRouterAddress =
         0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
@@ -210,6 +210,6 @@ contract disCarbonSwapAndRetire {
 
     /// @notice Forwards the carbon tokens to the pooling Address.
     function forwardCarbonTokenToPool(uint256 carbonAmount) private {
-        IERC20(NCTAddress).transfer(poolingAddress, carbonAmount);
+        IERC20(NCTAddress).transfer(donationAddress, carbonAmount);
     }
 }
