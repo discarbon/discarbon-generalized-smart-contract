@@ -134,7 +134,7 @@ A function to get the number of contributors.
 function retireWithMatic(uint256 carbonAmount) external payable
 ```
 
-Receives Matic, swaps to carbon token and forwards the swapped         tokens. Returns any excess Matic.
+Receives Matic, swaps to carbon token and retires the carbon         tokens. Forwards donations in carbon tokens. Returns any excess Matic.
 
 
 
@@ -142,7 +142,7 @@ Receives Matic, swaps to carbon token and forwards the swapped         tokens. R
 
 | Name | Type | Description |
 |---|---|---|
-| carbonAmount | uint256 | The number of carbon tokens that need to be forwarded. |
+| carbonAmount | uint256 | The number of carbon tokens that need to be retired. |
 
 ### retireWithToken
 
@@ -150,7 +150,7 @@ Receives Matic, swaps to carbon token and forwards the swapped         tokens. R
 function retireWithToken(address fromToken, uint256 carbonAmount) external nonpayable
 ```
 
-Takes user approved token, swaps to carbon token and forwards         the swapped tokens. Only takes as many tokens as needed.
+Takes user approved token, swaps to carbon token and retires         the swapped tokens. Forwards donations in carbon tokens Only         takes as many tokens as needed.
 
 
 

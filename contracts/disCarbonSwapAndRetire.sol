@@ -38,9 +38,9 @@ contract disCarbonSwapAndRetire {
     ///@dev Needed, otherwise uniswap router for matic fails
     fallback() external payable {}
 
-    /// @notice Receives Matic, swaps to carbon token and forwards the swapped
-    ///         tokens. Returns any excess Matic.
-    /// @param carbonAmount The number of carbon tokens that need to be forwarded.
+    /// @notice Receives Matic, swaps to carbon token and retires the carbon
+    ///         tokens. Forwards donations in carbon tokens. Returns any excess Matic.
+    /// @param carbonAmount The number of carbon tokens that need to be retired.
     function retireWithMatic(uint256 carbonAmount) public payable {
         swapMaticToCarbonToken(carbonAmount);
         doAccounting(carbonAmount);
@@ -49,8 +49,9 @@ contract disCarbonSwapAndRetire {
         emit ContributionSent("Matic", carbonAmount);
     }
 
-    /// @notice Takes user approved token, swaps to carbon token and forwards
-    ///         the swapped tokens. Only takes as many tokens as needed.
+    /// @notice Takes user approved token, swaps to carbon token and retires
+    ///         the swapped tokens. Forwards donations in carbon tokens Only
+    ///         takes as many tokens as needed.
     /// @param fromToken Address of the token that is used to swap from.
     /// @param carbonAmount The number of carbon tokens that need to be forwarded.
     function retireWithToken(address fromToken, uint256 carbonAmount)
