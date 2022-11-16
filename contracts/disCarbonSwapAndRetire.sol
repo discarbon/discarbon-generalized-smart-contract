@@ -44,7 +44,7 @@ contract disCarbonSwapAndRetire {
     function participateWithMatic(uint256 carbonAmount) public payable {
         swapMaticToCarbonToken(carbonAmount);
         doAccounting(carbonAmount);
-        forwardCarbonTokenToPool(carbonAmount);
+        forwardDonation(carbonAmount);
         returnExcessMatic();
         emit ContributionSent("Matic", carbonAmount);
     }
@@ -69,7 +69,7 @@ contract disCarbonSwapAndRetire {
         }
 
         doAccounting(carbonAmount);
-        forwardCarbonTokenToPool(carbonAmount);
+        forwardDonation(carbonAmount);
         emit ContributionSent("Token", carbonAmount);
     }
 
@@ -209,7 +209,7 @@ contract disCarbonSwapAndRetire {
     }
 
     /// @notice Forwards the carbon tokens to the pooling Address.
-    function forwardCarbonTokenToPool(uint256 carbonAmount) private {
+    function forwardDonation(uint256 carbonAmount) private {
         IERC20(NCTAddress).transfer(donationAddress, carbonAmount);
     }
 }
