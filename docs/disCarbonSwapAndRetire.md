@@ -10,6 +10,29 @@ This contract exchanges the coins/tokens of the user for carbon         tokens (
 
 ## Methods
 
+### addDonation
+
+```solidity
+function addDonation(uint256 carbonAmountToRetire, uint256 donatioPercentage) external pure returns (uint256)
+```
+
+Calculates the amount of carbon tokens that need to be swapped         including donations.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| carbonAmountToRetire | uint256 | Carbon amount that needs to be retired. |
+| donatioPercentage | uint256 | The given donation percentage which needs         to be added. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | carbonAmountWithDonation How many carbon tokens need to be         received from swap to have enough for the donation. |
+
 ### calculateNeededAmount
 
 ```solidity
@@ -131,7 +154,7 @@ A function to get the number of contributors.
 ### retireWithMatic
 
 ```solidity
-function retireWithMatic(uint256 carbonAmountToRetire) external payable
+function retireWithMatic(uint256 carbonAmountToRetire, uint256 donationPercentage) external payable
 ```
 
 Receives Matic, swaps to carbon token and retires the carbon         tokens. Forwards donations in carbon tokens. Returns any excess Matic.
@@ -143,11 +166,12 @@ Receives Matic, swaps to carbon token and retires the carbon         tokens. For
 | Name | Type | Description |
 |---|---|---|
 | carbonAmountToRetire | uint256 | The number of carbon tokens that need to be retired. |
+| donationPercentage | uint256 | Donation as a percentage 1 = 1% added for donation. |
 
 ### retireWithToken
 
 ```solidity
-function retireWithToken(address fromToken, uint256 carbonAmountToRetire) external nonpayable
+function retireWithToken(address fromToken, uint256 carbonAmountToRetire, uint256 donationPercentage) external nonpayable
 ```
 
 Takes user approved token, swaps to carbon token and retires         the swapped tokens. Forwards donations in carbon tokens Only         takes as many tokens as needed.
@@ -160,6 +184,7 @@ Takes user approved token, swaps to carbon token and retires         the swapped
 |---|---|---|
 | fromToken | address | Address of the token that is used to swap from. |
 | carbonAmountToRetire | uint256 | The number of carbon tokens that need to be forwarded. |
+| donationPercentage | uint256 | Donation as a percentage 1 = 1% added for donation. |
 
 ### totalCarbonPooled
 

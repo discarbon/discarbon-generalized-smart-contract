@@ -41,8 +41,10 @@ contract disCarbonSwapAndRetire {
     /// @notice Receives Matic, swaps to carbon token and retires the carbon
     ///         tokens. Forwards donations in carbon tokens. Returns any excess Matic.
     /// @param carbonAmountToRetire The number of carbon tokens that need to be retired.
-    function retireWithMatic(uint256 carbonAmountToRetire) public payable {
-        swapMaticToCarbonToken(carbonAmountToRetire);
+    /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
+    function retireWithMatic(uint256 carbonAmountToRetire, uint256 donationPercentage) public payable {
+        uint256 carbonAmountWithDonation = addDonation(carbonAmountToRetire, donationPercentage);
+        swapMaticToCarbonToken(carbonAmountWithDonation);
         doAccounting(carbonAmountToRetire);
         forwardDonation(carbonAmountToRetire);
         returnExcessMatic();
@@ -54,19 +56,22 @@ contract disCarbonSwapAndRetire {
     ///         takes as many tokens as needed.
     /// @param fromToken Address of the token that is used to swap from.
     /// @param carbonAmountToRetire The number of carbon tokens that need to be forwarded.
-    function retireWithToken(address fromToken, uint256 carbonAmountToRetire)
+    /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
+    function retireWithToken(address fromToken, uint256 carbonAmountToRetire, uint256 donationPercentage)
         public
     {
+        uint256 carbonAmountWithDonation = addDonation(carbonAmountToRetire, donationPercentage);
+
         if (fromToken == NCTAddress) {
             // Directly transfer NCT tokens.
             IERC20(fromToken).safeTransferFrom(
                 msg.sender,
                 address(this),
-                carbonAmountToRetire
+                carbonAmountWithDonation
             );
         } else {
             // for all other tokens do a swap.
-            swapTokenToCarbonToken(fromToken, carbonAmountToRetire);
+            swapTokenToCarbonToken(fromToken, carbonAmountWithDonation);
         }
 
         doAccounting(carbonAmountToRetire);
@@ -101,6 +106,22 @@ contract disCarbonSwapAndRetire {
         );
 
         return tokenAmountNeeded[0];
+    }
+
+    /// @notice Calculates the amount of carbon tokens that need to be swapped
+    ///         including donations.
+    /// @param carbonAmountToRetire Carbon amount that needs to be retired.
+    /// @param donatioPercentage The given donation percentage which needs
+    ///         to be added.
+    /// @return carbonAmountWithDonation How many carbon tokens need to be
+    ///         received from swap to have enough for the donation.
+    function addDonation(uint256 carbonAmountToRetire, uint256 donatioPercentage)
+        public
+        pure
+        returns (uint256)
+    {
+        uint256 carbonAmountWithDonation = carbonAmountToRetire*(100 + donatioPercentage)/100;
+        return carbonAmountWithDonation;
     }
 
     /// @notice A getter function for the array with all the contributors addresses.
@@ -194,7 +215,7 @@ contract disCarbonSwapAndRetire {
     }
 
     /// @notice Does the accounting (storing addresses and values contributed).
-    /// @param carbonAmountToRetire Amount of carbon tokens contributed.
+    /// @param carbonAmountToRetire Amount of carbon tokens retired.
     function doAccounting(uint256 carbonAmountToRetire) private {
         totalCarbonPooled += carbonAmountToRetire;
         if (contributions[msg.sender] == 0) {
