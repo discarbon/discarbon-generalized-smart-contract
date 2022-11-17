@@ -13,7 +13,7 @@ This contract exchanges the coins/tokens of the user for carbon         tokens (
 ### calculateNeededAmount
 
 ```solidity
-function calculateNeededAmount(address fromToken, uint256 carbonAmount) external view returns (uint256)
+function calculateNeededAmount(address fromToken, uint256 carbonAmountToRetire) external view returns (uint256)
 ```
 
 Calculates the needed amount of coins/tokens.         the swapped tokens.
@@ -25,7 +25,7 @@ Calculates the needed amount of coins/tokens.         the swapped tokens.
 | Name | Type | Description |
 |---|---|---|
 | fromToken | address | Address of the token that is used to swap from.        To estimate Matic tokens, use WMATIC address. |
-| carbonAmount | uint256 | Carbon Amount that needs to be purchased. |
+| carbonAmountToRetire | uint256 | Carbon Amount that needs to be purchased. |
 
 #### Returns
 
@@ -131,7 +131,7 @@ A function to get the number of contributors.
 ### retireWithMatic
 
 ```solidity
-function retireWithMatic(uint256 carbonAmount) external payable
+function retireWithMatic(uint256 carbonAmountToRetire) external payable
 ```
 
 Receives Matic, swaps to carbon token and retires the carbon         tokens. Forwards donations in carbon tokens. Returns any excess Matic.
@@ -142,12 +142,12 @@ Receives Matic, swaps to carbon token and retires the carbon         tokens. For
 
 | Name | Type | Description |
 |---|---|---|
-| carbonAmount | uint256 | The number of carbon tokens that need to be retired. |
+| carbonAmountToRetire | uint256 | The number of carbon tokens that need to be retired. |
 
 ### retireWithToken
 
 ```solidity
-function retireWithToken(address fromToken, uint256 carbonAmount) external nonpayable
+function retireWithToken(address fromToken, uint256 carbonAmountToRetire) external nonpayable
 ```
 
 Takes user approved token, swaps to carbon token and retires         the swapped tokens. Forwards donations in carbon tokens Only         takes as many tokens as needed.
@@ -159,7 +159,7 @@ Takes user approved token, swaps to carbon token and retires         the swapped
 | Name | Type | Description |
 |---|---|---|
 | fromToken | address | Address of the token that is used to swap from. |
-| carbonAmount | uint256 | The number of carbon tokens that need to be forwarded. |
+| carbonAmountToRetire | uint256 | The number of carbon tokens that need to be forwarded. |
 
 ### totalCarbonPooled
 

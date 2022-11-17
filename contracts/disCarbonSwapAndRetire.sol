@@ -40,21 +40,21 @@ contract disCarbonSwapAndRetire {
 
     /// @notice Receives Matic, swaps to carbon token and retires the carbon
     ///         tokens. Forwards donations in carbon tokens. Returns any excess Matic.
-    /// @param carbonAmount The number of carbon tokens that need to be retired.
-    function retireWithMatic(uint256 carbonAmount) public payable {
-        swapMaticToCarbonToken(carbonAmount);
-        doAccounting(carbonAmount);
-        forwardDonation(carbonAmount);
+    /// @param carbonAmountToRetire The number of carbon tokens that need to be retired.
+    function retireWithMatic(uint256 carbonAmountToRetire) public payable {
+        swapMaticToCarbonToken(carbonAmountToRetire);
+        doAccounting(carbonAmountToRetire);
+        forwardDonation(carbonAmountToRetire);
         returnExcessMatic();
-        emit ContributionSent("Matic", carbonAmount);
+        emit ContributionSent("Matic", carbonAmountToRetire);
     }
 
     /// @notice Takes user approved token, swaps to carbon token and retires
     ///         the swapped tokens. Forwards donations in carbon tokens Only
     ///         takes as many tokens as needed.
     /// @param fromToken Address of the token that is used to swap from.
-    /// @param carbonAmount The number of carbon tokens that need to be forwarded.
-    function retireWithToken(address fromToken, uint256 carbonAmount)
+    /// @param carbonAmountToRetire The number of carbon tokens that need to be forwarded.
+    function retireWithToken(address fromToken, uint256 carbonAmountToRetire)
         public
     {
         if (fromToken == NCTAddress) {
@@ -62,33 +62,33 @@ contract disCarbonSwapAndRetire {
             IERC20(fromToken).safeTransferFrom(
                 msg.sender,
                 address(this),
-                carbonAmount
+                carbonAmountToRetire
             );
         } else {
             // for all other tokens do a swap.
-            swapTokenToCarbonToken(fromToken, carbonAmount);
+            swapTokenToCarbonToken(fromToken, carbonAmountToRetire);
         }
 
-        doAccounting(carbonAmount);
-        forwardDonation(carbonAmount);
-        emit ContributionSent("Token", carbonAmount);
+        doAccounting(carbonAmountToRetire);
+        forwardDonation(carbonAmountToRetire);
+        emit ContributionSent("Token", carbonAmountToRetire);
     }
 
     ///@notice Calculates the needed amount of coins/tokens.
     ///         the swapped tokens.
     /// @param fromToken Address of the token that is used to swap from.
     ///        To estimate Matic tokens, use WMATIC address.
-    /// @param carbonAmount Carbon Amount that needs to be purchased.
+    /// @param carbonAmountToRetire Carbon Amount that needs to be purchased.
     /// @return tokenAmountNeeded How many tokens/coins needed for buying the needed
     ///         carbon tokens.
-    function calculateNeededAmount(address fromToken, uint256 carbonAmount)
+    function calculateNeededAmount(address fromToken, uint256 carbonAmountToRetire)
         public
         view
         returns (uint256)
     {
         // if NCT is supplied no swap necessary
         if (fromToken == NCTAddress) {
-            return carbonAmount;
+            return carbonAmountToRetire;
         }
 
         address[] memory path = makePath(fromToken);
@@ -96,7 +96,7 @@ contract disCarbonSwapAndRetire {
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
 
         uint256[] memory tokenAmountNeeded = sushiRouter.getAmountsIn(
-            carbonAmount,
+            carbonAmountToRetire,
             path
         );
 
@@ -142,12 +142,12 @@ contract disCarbonSwapAndRetire {
     }
 
     /// @notice Does the swap for Matic coins.
-    function swapMaticToCarbonToken(uint256 carbonAmount) private {
+    function swapMaticToCarbonToken(uint256 carbonAmountToRetire) private {
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
         address[] memory path = makePath(WMATICAddress);
 
         uint256[] memory tokenToSwap = sushiRouter.getAmountsIn(
-            carbonAmount,
+            carbonAmountToRetire,
             path
         );
         require(
@@ -156,7 +156,7 @@ contract disCarbonSwapAndRetire {
         );
 
         sushiRouter.swapETHForExactTokens{value: msg.value}(
-            carbonAmount,
+            carbonAmountToRetire,
             path,
             address(this),
             block.timestamp
@@ -165,14 +165,14 @@ contract disCarbonSwapAndRetire {
 
     /// @notice Does the swap for all ERC-20 tokens.
     /// @param fromToken Address of the token that is used to swap from
-    /// @param carbonAmount Amount of carbon tokens one needs.
-    function swapTokenToCarbonToken(address fromToken, uint256 carbonAmount)
+    /// @param carbonAmountToRetire Amount of carbon tokens one needs.
+    function swapTokenToCarbonToken(address fromToken, uint256 carbonAmountToRetire)
         private
     {
         IUniswapV2Router02 routerSushi = IUniswapV2Router02(sushiRouterAddress);
         address[] memory path = makePath(fromToken);
         uint256[] memory tokensNeeded = routerSushi.getAmountsIn(
-            carbonAmount,
+            carbonAmountToRetire,
             path
         );
         // transfer tokens to this contract
@@ -185,7 +185,7 @@ contract disCarbonSwapAndRetire {
         IERC20(fromToken).approve(sushiRouterAddress, tokensNeeded[0]);
         // swap
         routerSushi.swapTokensForExactTokens(
-            carbonAmount,
+            carbonAmountToRetire,
             tokensNeeded[0],
             path,
             address(this),
@@ -194,13 +194,13 @@ contract disCarbonSwapAndRetire {
     }
 
     /// @notice Does the accounting (storing addresses and values contributed).
-    /// @param carbonAmount Amount of carbon tokens contributed.
-    function doAccounting(uint256 carbonAmount) private {
-        totalCarbonPooled += carbonAmount;
+    /// @param carbonAmountToRetire Amount of carbon tokens contributed.
+    function doAccounting(uint256 carbonAmountToRetire) private {
+        totalCarbonPooled += carbonAmountToRetire;
         if (contributions[msg.sender] == 0) {
             contributorsAddresses.push(msg.sender);
         }
-        contributions[msg.sender] += carbonAmount;
+        contributions[msg.sender] += carbonAmountToRetire;
     }
 
     /// @notice Returns excess matic not used in the swap.
@@ -210,7 +210,7 @@ contract disCarbonSwapAndRetire {
     }
 
     /// @notice Forwards the donation to the disCarbon multisig.
-    function forwardDonation(uint256 carbonAmount) private {
-        IERC20(NCTAddress).transfer(donationAddress, carbonAmount);
+    function forwardDonation(uint256 carbonAmountToRetire) private {
+        IERC20(NCTAddress).transfer(donationAddress, carbonAmountToRetire);
     }
 }
