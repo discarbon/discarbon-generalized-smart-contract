@@ -426,10 +426,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
                 ToucanRetirementCertificateAddress
             );
 
-        uint256 i = 0;
-        uint256 tco2Len = tco2Addresses.length;
-        uint256 tco2Counter = 0;
-        while (i < tco2Len) {
+        uint256 tco2Counter;
+        for (uint256 i; i < tco2Addresses.length; i++) {
             if (tco2Amounts[i] > 0) {
                 IToucanCarbonOffsets(tco2Addresses[i]).retireAndMintCertificate(
                         "disCarbon Generalized Retirement Contract",
@@ -448,9 +446,6 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
                 tco2CertificateTokenIds[
                     tco2Counter - 1
                 ] = lastRetirementCertificateTokenId;
-            }
-            unchecked {
-                ++i;
             }
         }
     }
