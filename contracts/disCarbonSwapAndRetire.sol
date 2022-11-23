@@ -164,7 +164,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             uint256[] memory tco2CertificateTokenIds
         )
     {
-        uint256 carbonAmountToRetireWithDonation = addDonation(
+        uint256 carbonAmountWithDonation = addDonation(
             carbonAmountToRetire,
             donationPercentage
         );
@@ -174,11 +174,11 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             IERC20(fromToken).safeTransferFrom(
                 msg.sender,
                 address(this),
-                carbonAmountToRetireWithDonation
+                carbonAmountWithDonation
             );
         } else {
             // for all other tokens do a swap.
-            swapTokenToCarbonToken(fromToken, carbonAmountToRetireWithDonation);
+            swapTokenToCarbonToken(fromToken, carbonAmountWithDonation);
         }
 
         doAccounting(carbonAmountToRetire, beneficiaryAddress);
@@ -263,15 +263,15 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param carbonAmountToRetire Carbon amount that needs to be retired.
     /// @param donatioPercentage The given donation percentage which needs
     ///         to be added.
-    /// @return carbonAmountToRetireWithDonation How many carbon tokens need to be
+    /// @return carbonAmountWithDonation How many carbon tokens need to be
     ///         received from swap to have enough for the donation.
     function addDonation(
         uint256 carbonAmountToRetire,
         uint256 donatioPercentage
     ) public pure returns (uint256) {
-        uint256 carbonAmountToRetireWithDonation = (carbonAmountToRetire *
+        uint256 carbonAmountWithDonation = (carbonAmountToRetire *
             (100 + donatioPercentage)) / 100;
-        return carbonAmountToRetireWithDonation;
+        return carbonAmountWithDonation;
     }
 
     /// @notice A getter function for the array holding all addresses that have retired via this contract.
