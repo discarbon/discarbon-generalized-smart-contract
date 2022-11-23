@@ -2,13 +2,139 @@
 
 *haurog, danceratopz*
 
-> disCarbon generalized swap and retire contract
+
 
 This contract exchanges the coins/tokens of the user for carbon         tokens (NCT) and redeems them for an underlying project token and         retires them. It also keeps track on the cumulative retirements of         each address.
 
 
 
 ## Methods
+
+### autoRetireWithMatic
+
+```solidity
+function autoRetireWithMatic(uint256 carbonAmount, address beneficiaryAddress, string beneficiaryString, string retirementMessage) external payable returns (address[] tco2Addresses, uint256[] tco2Amounts, uint256[] tco2CertificateTokenIds)
+```
+
+Receives Matic, swaps to carbon token and retires the swapped         tokens via autoRedeem. Returns any excess Matic.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| carbonAmount | uint256 | The number of carbon tokens to be retired. |
+| beneficiaryAddress | address | The retirement beneficiary to specify in the retirement certificate. |
+| beneficiaryString | string | The retirement beneficiary name to specify in the retirement certificate. |
+| retirementMessage | string | The retirement message to specify in the retirement certficiate. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| tco2Addresses | address[] | An array of the TCO2 addresses that were retired. |
+| tco2Amounts | uint256[] | An array of the amounts of each TCO2 that was retired. |
+| tco2CertificateTokenIds | uint256[] | An array of the corresponding retirement certicate ids. |
+
+### autoRetireWithMatic
+
+```solidity
+function autoRetireWithMatic(uint256 carbonAmount) external payable returns (address[] tco2Addresses, uint256[] tco2Amounts, uint256[] tco2CertificateTokenIds)
+```
+
+Receives Matic, swaps to carbon token and retires the swapped         tokens via autoRedeem. Returns any excess Matic.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| carbonAmount | uint256 | The number of carbon tokens to be retired. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| tco2Addresses | address[] | An array of the TCO2 addresses that were retired. |
+| tco2Amounts | uint256[] | An array of the amounts of each TCO2 that was retired. |
+| tco2CertificateTokenIds | uint256[] | An array of the corresponding retirement certicate ids. |
+
+### autoRetireWithToken
+
+```solidity
+function autoRetireWithToken(address fromToken, uint256 carbonAmount, address beneficiaryAddress, string beneficiaryString, string retirementMessage) external nonpayable returns (address[] tco2Addresses, uint256[] tco2Amounts, uint256[] tco2CertificateTokenIds)
+```
+
+Takes a user approved token, swaps to carbon token and retires the         swapped tokens via autoRedeem. Only takes as many tokens as needed.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| fromToken | address | Address of the erc20 token sent to buy carbon tokens with. |
+| carbonAmount | uint256 | The number of carbon tokens to be retired. |
+| beneficiaryAddress | address | The retirement beneficiary to specify in the retirement certificate. |
+| beneficiaryString | string | The retirement beneficiary name to specify in the retirement certificate. |
+| retirementMessage | string | The retirement message to specify in the retirement certficiate. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| tco2Addresses | address[] | An array of the TCO2 addresses that were retired. |
+| tco2Amounts | uint256[] | An array of the amounts of each TCO2 that was retired. |
+| tco2CertificateTokenIds | uint256[] | An array of the corresponding retirement certicate ids. |
+
+### autoRetireWithToken
+
+```solidity
+function autoRetireWithToken(address fromToken, uint256 carbonAmount) external nonpayable returns (address[] tco2Addresses, uint256[] tco2Amounts, uint256[] tco2CertificateTokenIds)
+```
+
+Takes a user approved token, swaps to carbon token and retires the         swapped tokens via autoRedeem. Only takes as many tokens as needed.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| fromToken | address | Address of the erc20 token sent to buy carbon tokens with. |
+| carbonAmount | uint256 | The number of carbon tokens to be retired. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| tco2Addresses | address[] | An array of the TCO2 addresses that were retired. |
+| tco2Amounts | uint256[] | An array of the amounts of each TCO2 that was retired. |
+| tco2CertificateTokenIds | uint256[] | An array of the corresponding retirement certicate ids. |
+
+### beneficiaryRetirements
+
+```solidity
+function beneficiaryRetirements(address) external view returns (uint256)
+```
+
+The total amount of carbon retired by each beneficiary
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### addDonation
 
@@ -141,51 +267,6 @@ Takes a user approved token, swaps to carbon token and retires the         swapp
 | tco2Amounts | uint256[] | An array of the amounts of each TCO2 that was retired. |
 | tco2CertificateTokenIds | uint256[] | An array of the corresponding retirement certicate ids. |
 
-### beneficiaryRetirements
-
-```solidity
-function beneficiaryRetirements(address) external view returns (uint256)
-```
-
-The total amount of carbon retired by each beneficiary
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
-
-### calculateNeededAmount
-
-```solidity
-function calculateNeededAmount(address fromToken, uint256 carbonAmountToRetire) external view returns (uint256)
-```
-
-Calculates the needed amount of coins/tokens.         the swapped tokens.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| fromToken | address | Address of the token that is used to swap from.        To estimate Matic tokens, use WMATIC address. |
-| carbonAmountToRetire | uint256 | Carbon Amount that needs to be purchased. |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | tokenAmountNeeded How many tokens/coins needed for buying the needed         carbon tokens. |
-
 ### callerRetirements
 
 ```solidity
@@ -208,23 +289,6 @@ The total amount of carbon retired by each address that has called this contract
 |---|---|---|
 | _0 | uint256 | undefined |
 
-### donationAddress
-
-```solidity
-function donationAddress() external view returns (address)
-```
-
-Address to where the donations are sent to
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
-
 ### getRetirementCallerAddresses
 
 ```solidity
@@ -232,6 +296,17 @@ function getRetirementCallerAddresses() external view returns (address[])
 ```
 
 A getter function for the array holding all addresses that have retired via this contract.
+
+
+
+
+### donationAddress
+
+```solidity
+function donationAddress() external view returns (address)
+```
+
+Address to where the donations are sent to
 
 
 
@@ -293,6 +368,7 @@ function retirementBeneficiaryAddresses(uint256) external view returns (address)
 An array of addresses that have been specified as retirement beneficiaries
 
 
+*Required for use with safeTransferFrom() (from OpenZeppelin&#39;s ERC721 contract) used      by Toucan&#39;s RetirementCertificates in order to transfer the ERC721 retirement      certificates to this contract).*
 
 #### Parameters
 
@@ -352,7 +428,7 @@ The total amount of carbon retired via this contract
 ### CarbonRetired
 
 ```solidity
-event CarbonRetired(string tokenOrCoin, uint256 carbonAmountRetired)
+event CarbonRetired(string tokenOrCoin, uint256 amountRetired)
 ```
 
 Emitted after carbon tokens have been retired.
@@ -364,7 +440,7 @@ Emitted after carbon tokens have been retired.
 | Name | Type | Description |
 |---|---|---|
 | tokenOrCoin  | string | undefined |
-| carbonAmountRetired  | uint256 | undefined |
+| amountRetired  | uint256 | undefined |
 
 ### ERC721Received
 
