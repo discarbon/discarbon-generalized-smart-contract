@@ -97,7 +97,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             beneficiaryString,
             retirementMessage
         );
-        forwardDonation(carbonAmountToRetire);
+        uint256 carbonAmountToDonate = carbonAmountWithDonation - carbonAmountToRetire;
+        forwardDonation(carbonAmountToDonate);
         returnExcessMatic();
         emit CarbonRetired("Matic", carbonAmountToRetire);
     }
@@ -188,7 +189,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             beneficiaryString,
             retirementMessage
         );
-        forwardDonation(carbonAmountToRetire);
+        uint256 carbonAmountToDonate = carbonAmountWithDonation - carbonAmountToRetire;
+        forwardDonation(carbonAmountToDonate);
         emit CarbonRetired("Token", carbonAmountToRetire);
     }
 
