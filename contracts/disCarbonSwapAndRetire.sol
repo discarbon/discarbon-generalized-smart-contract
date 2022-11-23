@@ -277,9 +277,13 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @notice A getter function for the array holding all addresses that have retired via this contract.
     /// @return retireeAddresses An array (can be empty) of all addresses that have retired.
     function getRetirementCallerAddresses()
+       
         public
+       
         view
+       
         returns (address[] memory)
+   
     {
         return retirementCallerAddresses;
     }
