@@ -451,8 +451,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     }
 
     /// @notice Forwards the donation to the disCarbon multisig.
-    function forwardDonation(uint256 carbonAmountToRetire) private {
-        IERC20(NCTAddress).transfer(donationAddress, carbonAmountToRetire);
+    function forwardDonation(uint256 carbonAmountToDonate) private {
+        IERC20(NCTAddress).transfer(donationAddress, carbonAmountToDonate);
     }
 
     /// @dev Required for use with safeTransferFrom() (from OpenZeppelin's ERC721 contract) used
