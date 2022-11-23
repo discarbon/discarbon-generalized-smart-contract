@@ -10,7 +10,7 @@ async function main() {
   const disCarbonSwapAndRetire = await hre.ethers.getContractFactory("disCarbonSwapAndRetire");
   const retireContract = await disCarbonSwapAndRetire.deploy();
 
-  await pooling.deployed();
+  await retireContract.deployed();
 
   console.log("Pooling deployed:", retireContract.address);
 }
