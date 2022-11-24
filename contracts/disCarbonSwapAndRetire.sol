@@ -66,10 +66,10 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
     /// @param beneficiaryAddress The retirement beneficiary to specify in the retirement certificate.
     /// @param beneficiaryString The retirement beneficiary name to specify in the retirement certificate.
-    /// @param retirementMessage The retirement message to specify in the retirement certficiate.
+    /// @param retirementMessage The retirement message to specify in the retirement certificate.
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
-    /// @return tco2CertificateTokenIds An array of the corresponding retirement certicate ids.
+    /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
     function autoRetireWithMatic(
         uint256 carbonAmountToRetire,
         uint256 donationPercentage,
@@ -109,7 +109,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
-    /// @return tco2CertificateTokenIds An array of the corresponding retirement certicate ids.
+    /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
     function autoRetireWithMatic(
         uint256 carbonAmountToRetire,
         uint256 donationPercentage
@@ -146,10 +146,10 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
     /// @param beneficiaryAddress The retirement beneficiary to specify in the retirement certificate.
     /// @param beneficiaryString The retirement beneficiary name to specify in the retirement certificate.
-    /// @param retirementMessage The retirement message to specify in the retirement certficiate.
+    /// @param retirementMessage The retirement message to specify in the retirement certificate.
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
-    /// @return tco2CertificateTokenIds An array of the corresponding retirement certicate ids.
+    /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
     function autoRetireWithToken(
         address fromToken,
         uint256 carbonAmountToRetire,
@@ -201,7 +201,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
-    /// @return tco2CertificateTokenIds An array of the corresponding retirement certicate ids.
+    /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
     function autoRetireWithToken(
         address fromToken,
         uint256 carbonAmountToRetire,
@@ -404,10 +404,10 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param amount Amount of NCT to redeem and retire.
     /// @param beneficiaryAddress The retirement beneficiary to specify in the retirement certificate.
     /// @param beneficiaryString The retirement beneficiary name to specify in the retirement certificate.
-    /// @param retirementMessage The retirement message to specify in the retirement certficiate.
+    /// @param retirementMessage The retirement message to specify in the retirement certificate.
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
-    /// @return tco2CertificateTokenIds An array of the corresponding retirement certicate ids.
+    /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
     function autoRetire(
         uint256 amount,
         address beneficiaryAddress,
