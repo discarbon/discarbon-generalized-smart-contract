@@ -31,14 +31,11 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @notice Address to where the donations are sent to
     address public donationAddress = 0xCFA521D5514dDf8334f3907dcFe99752D51580E9; // disCarbon Polygon Safe Multisig
 
-
-    address private sushiRouterAddress =
-        0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
+    address private sushiRouterAddress = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
     address private NCTAddress = 0xD838290e877E0188a4A44700463419ED96c16107;
     address private WMATICAddress = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
     address private USDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
-    address private ToucanRetirementCertificateAddress =
-        0x5e377f16E4ec6001652befD737341a28889Af002;
+    address private ToucanRetirementCertificateAddress = 0x5e377f16E4ec6001652befD737341a28889Af002;
 
     /// @notice The tokenID of the last ERC721 sent to this contract: A workaround in order to
     ///         send the retirement certificate to the retirement beneficiary address, see
@@ -85,10 +82,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             uint256[] memory tco2CertificateTokenIds
         )
     {
-        uint256 carbonAmountWithDonation = addDonation(
-            carbonAmountToRetire,
-            donationPercentage
-        );
+        uint256 carbonAmountWithDonation = addDonation(carbonAmountToRetire, donationPercentage);
         swapMaticToCarbonToken(carbonAmountWithDonation);
         doAccounting(carbonAmountToRetire, beneficiaryAddress);
         (tco2Addresses, tco2Amounts, tco2CertificateTokenIds) = autoRetire(
@@ -110,10 +104,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
     /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
-    function autoRetireWithMatic(
-        uint256 carbonAmountToRetire,
-        uint256 donationPercentage
-    )
+    function autoRetireWithMatic(uint256 carbonAmountToRetire, uint256 donationPercentage)
         public
         payable
         returns (
@@ -124,13 +115,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     {
         address beneficiaryAddress = msg.sender;
         string memory beneficiaryString = "";
-        string
-            memory retirementMessage = "Retired via disCarbon's retirement contracts";
-        (
-            tco2Addresses,
-            tco2Amounts,
-            tco2CertificateTokenIds
-        ) = autoRetireWithMatic(
+        string memory retirementMessage = "Retired via disCarbon's retirement contracts";
+        (tco2Addresses, tco2Amounts, tco2CertificateTokenIds) = autoRetireWithMatic(
             carbonAmountToRetire,
             donationPercentage,
             beneficiaryAddress,
@@ -165,18 +151,11 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             uint256[] memory tco2CertificateTokenIds
         )
     {
-        uint256 carbonAmountWithDonation = addDonation(
-            carbonAmountToRetire,
-            donationPercentage
-        );
+        uint256 carbonAmountWithDonation = addDonation(carbonAmountToRetire, donationPercentage);
 
         if (fromToken == NCTAddress) {
             // Directly transfer NCT tokens.
-            IERC20(fromToken).safeTransferFrom(
-                msg.sender,
-                address(this),
-                carbonAmountWithDonation
-            );
+            IERC20(fromToken).safeTransferFrom(msg.sender, address(this), carbonAmountWithDonation);
         } else {
             // for all other tokens do a swap.
             swapTokenToCarbonToken(fromToken, carbonAmountWithDonation);
@@ -216,13 +195,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     {
         address beneficiaryAddress = msg.sender;
         string memory beneficiaryString = "";
-        string
-            memory retirementMessage = "Retired via disCarbon's retirement contracts";
-        (
-            tco2Addresses,
-            tco2Amounts,
-            tco2CertificateTokenIds
-        ) = autoRetireWithToken(
+        string memory retirementMessage = "Retired via disCarbon's retirement contracts";
+        (tco2Addresses, tco2Amounts, tco2CertificateTokenIds) = autoRetireWithToken(
             fromToken,
             carbonAmountToRetire,
             donationPercentage,
@@ -239,10 +213,11 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param carbonAmountToRetire Carbon Amount that needs to be purchased.
     /// @return tokenAmountNeeded How many tokens/coins needed for buying the needed
     ///         carbon tokens.
-    function calculateNeededAmount(
-        address fromToken,
-        uint256 carbonAmountToRetire
-    ) public view returns (uint256) {
+    function calculateNeededAmount(address fromToken, uint256 carbonAmountToRetire)
+        public
+        view
+        returns (uint256)
+    {
         // if NCT is supplied no swap necessary
         if (fromToken == NCTAddress) {
             return carbonAmountToRetire;
@@ -252,10 +227,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
 
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
 
-        uint256[] memory tokenAmountNeeded = sushiRouter.getAmountsIn(
-            carbonAmountToRetire,
-            path
-        );
+        uint256[] memory tokenAmountNeeded = sushiRouter.getAmountsIn(carbonAmountToRetire, path);
 
         return tokenAmountNeeded[0];
     }
@@ -267,26 +239,18 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     ///         to be added.
     /// @return carbonAmountWithDonation How many carbon tokens need to be
     ///         received from swap to have enough for the donation.
-    function addDonation(
-        uint256 carbonAmountToRetire,
-        uint256 donatioPercentage
-    ) public pure returns (uint256) {
-        uint256 carbonAmountWithDonation = (carbonAmountToRetire *
-            (100 + donatioPercentage)) / 100;
+    function addDonation(uint256 carbonAmountToRetire, uint256 donatioPercentage)
+        public
+        pure
+        returns (uint256)
+    {
+        uint256 carbonAmountWithDonation = (carbonAmountToRetire * (100 + donatioPercentage)) / 100;
         return carbonAmountWithDonation;
     }
 
     /// @notice A getter function for the array holding all addresses that have retired via this contract.
     /// @return retireeAddresses An array (can be empty) of all addresses that have retired.
-    function getRetirementCallerAddresses()
-       
-        public
-       
-        view
-       
-        returns (address[] memory)
-   
-    {
+    function getRetirementCallerAddresses() public view returns (address[] memory) {
         return retirementCallerAddresses;
     }
 
@@ -303,11 +267,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param fromToken Address of the token that is used to swap from.
     ///        To estimate Matic tokens, use WMATIC address.
     /// @return path An array with the path for the sushiswap router to do the swap.
-    function makePath(address fromToken)
-        private
-        view
-        returns (address[] memory)
-    {
+    function makePath(address fromToken) private view returns (address[] memory) {
         if (fromToken == USDCAddress) {
             address[] memory path = new address[](2);
             path[0] = USDCAddress;
@@ -327,14 +287,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
         address[] memory path = makePath(WMATICAddress);
 
-        uint256[] memory tokenToSwap = sushiRouter.getAmountsIn(
-            carbonAmountToRetire,
-            path
-        );
-        require(
-            msg.value >= tokenToSwap[0],
-            "Not enough Matic to swap to required carbon Token"
-        );
+        uint256[] memory tokenToSwap = sushiRouter.getAmountsIn(carbonAmountToRetire, path);
+        require(msg.value >= tokenToSwap[0], "Not enough Matic to swap to required carbon Token");
 
         sushiRouter.swapETHForExactTokens{value: msg.value}(
             carbonAmountToRetire,
@@ -347,22 +301,12 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @notice Does the swap for all ERC-20 tokens.
     /// @param fromToken Address of the token that is used to swap from
     /// @param carbonAmountToRetire Amount of carbon tokens one needs.
-    function swapTokenToCarbonToken(
-        address fromToken,
-        uint256 carbonAmountToRetire
-    ) private {
+    function swapTokenToCarbonToken(address fromToken, uint256 carbonAmountToRetire) private {
         IUniswapV2Router02 routerSushi = IUniswapV2Router02(sushiRouterAddress);
         address[] memory path = makePath(fromToken);
-        uint256[] memory tokensNeeded = routerSushi.getAmountsIn(
-            carbonAmountToRetire,
-            path
-        );
+        uint256[] memory tokensNeeded = routerSushi.getAmountsIn(carbonAmountToRetire, path);
         // transfer tokens to this contract
-        IERC20(fromToken).safeTransferFrom(
-            msg.sender,
-            address(this),
-            tokensNeeded[0]
-        );
+        IERC20(fromToken).safeTransferFrom(msg.sender, address(this), tokensNeeded[0]);
         // approve tokens for sushiRouter
         IERC20(fromToken).approve(sushiRouterAddress, tokensNeeded[0]);
         // swap
@@ -378,10 +322,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @notice Perform bookkeeping of how much each address (caller and beneficiary) has retired
     /// @param carbonAmountToRetire Amount of carbon tokens retired.
     /// @param beneficiaryAddress The retirement beneficiary's address as specified in the retirement certificate
-    function doAccounting(
-        uint256 carbonAmountToRetire,
-        address beneficiaryAddress
-    ) private {
+    function doAccounting(uint256 carbonAmountToRetire, address beneficiaryAddress) private {
         totalCarbonRetired += carbonAmountToRetire;
         if (callerRetirements[msg.sender] == 0) {
             retirementCallerAddresses.push(msg.sender);
@@ -425,19 +366,19 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         (tco2Addresses, tco2Amounts) = NCTPoolToken.redeemAuto2(amount);
 
         IRetirementCertificates retirementCertificates = IRetirementCertificates(
-                ToucanRetirementCertificateAddress
-            );
+            ToucanRetirementCertificateAddress
+        );
 
         uint256 tco2Counter;
         for (uint256 i; i < tco2Addresses.length; i++) {
             if (tco2Amounts[i] > 0) {
                 IToucanCarbonOffsets(tco2Addresses[i]).retireAndMintCertificate(
-                        "disCarbon Generalized Retirement Contract",
-                        beneficiaryAddress,
-                        beneficiaryString,
-                        retirementMessage,
-                        tco2Amounts[i]
-                    );
+                    "disCarbon Generalized Retirement Contract",
+                    beneficiaryAddress,
+                    beneficiaryString,
+                    retirementMessage,
+                    tco2Amounts[i]
+                );
                 retirementCertificates.safeTransferFrom(
                     address(this),
                     beneficiaryAddress,
@@ -445,9 +386,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
                 );
                 tco2Counter++;
                 tco2CertificateTokenIds = new uint256[](tco2Counter);
-                tco2CertificateTokenIds[
-                    tco2Counter - 1
-                ] = lastRetirementCertificateTokenId;
+                tco2CertificateTokenIds[tco2Counter - 1] = lastRetirementCertificateTokenId;
             }
         }
     }
