@@ -96,34 +96,6 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         emit CarbonRetired("Matic", carbonAmountToRetire);
     }
 
-    /// @notice Receives Matic, swaps to carbon token and retires the swapped
-    ///         tokens via autoRedeem. Returns any excess Matic.
-    /// @param carbonAmountToRetire The number of carbon tokens to be retired.
-    /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
-    /// @return tco2Addresses An array of the TCO2 addresses that were retired.
-    /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
-    /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
-    function autoRetireWithMatic(uint256 carbonAmountToRetire, uint256 donationPercentage)
-        public
-        payable
-        returns (
-            address[] memory tco2Addresses,
-            uint256[] memory tco2Amounts,
-            uint256[] memory tco2CertificateTokenIds
-        )
-    {
-        address beneficiaryAddress = msg.sender;
-        string memory beneficiaryString = "";
-        string memory retirementMessage = "Retired via disCarbon's retirement contracts";
-        (tco2Addresses, tco2Amounts, tco2CertificateTokenIds) = autoRetireWithMatic(
-            carbonAmountToRetire,
-            donationPercentage,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage
-        );
-    }
-
     /// @notice Takes a user approved token, swaps to carbon token and retires the
     ///         swapped tokens via autoRedeem. Only takes as many tokens as needed.
     /// @param fromToken Address of the erc20 token sent to buy carbon tokens with.
@@ -170,39 +142,6 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         uint256 carbonAmountToDonate = carbonAmountWithDonation - carbonAmountToRetire;
         forwardDonation(carbonAmountToDonate);
         emit CarbonRetired("Token", carbonAmountToRetire);
-    }
-
-    /// @notice Takes a user approved token, swaps to carbon token and retires the
-    ///         swapped tokens via autoRedeem. Only takes as many tokens as needed.
-    /// @param fromToken Address of the erc20 token sent to buy carbon tokens with.
-    /// @param carbonAmountToRetire The number of carbon tokens to be retired.
-    /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
-    /// @return tco2Addresses An array of the TCO2 addresses that were retired.
-    /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
-    /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
-    function autoRetireWithToken(
-        address fromToken,
-        uint256 carbonAmountToRetire,
-        uint256 donationPercentage
-    )
-        public
-        returns (
-            address[] memory tco2Addresses,
-            uint256[] memory tco2Amounts,
-            uint256[] memory tco2CertificateTokenIds
-        )
-    {
-        address beneficiaryAddress = msg.sender;
-        string memory beneficiaryString = "";
-        string memory retirementMessage = "Retired via disCarbon's retirement contracts";
-        (tco2Addresses, tco2Amounts, tco2CertificateTokenIds) = autoRetireWithToken(
-            fromToken,
-            carbonAmountToRetire,
-            donationPercentage,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage
-        );
     }
 
     ///@notice Calculates the needed amount of coins/tokens.
