@@ -66,7 +66,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
     /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
-    function autoRetireWithMatic(
+    function autoRetireAndMintCertificateWithMatic(
         uint256 carbonAmountToRetire,
         uint256 donationPercentage,
         address beneficiaryAddress,
@@ -84,7 +84,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         uint256 carbonAmountWithDonation = addDonation(carbonAmountToRetire, donationPercentage);
         swapMaticToCarbonToken(carbonAmountWithDonation);
         doAccounting(carbonAmountToRetire, beneficiaryAddress);
-        (tco2Addresses, tco2Amounts, tco2CertificateTokenIds) = autoRetire(
+        (tco2Addresses, tco2Amounts, tco2CertificateTokenIds) = autoRetireAndMintCertificate(
             carbonAmountToRetire,
             beneficiaryAddress,
             beneficiaryString,
@@ -108,7 +108,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
     /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
-    function autoRetireWithToken(
+    function autoRetireAndMintCertificateWithToken(
         address fromToken,
         uint256 carbonAmountToRetire,
         uint256 donationPercentage,
@@ -134,7 +134,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         }
 
         doAccounting(carbonAmountToRetire, beneficiaryAddress);
-        (tco2Addresses, tco2Amounts, tco2CertificateTokenIds) = autoRetire(
+        (tco2Addresses, tco2Amounts, tco2CertificateTokenIds) = autoRetireAndMintCertificate(
             carbonAmountToRetire,
             beneficiaryAddress,
             beneficiaryString,
@@ -317,7 +317,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
     /// @return tco2CertificateTokenIds An array of the corresponding retirement certificate ids.
-    function autoRetire(
+    function autoRetireAndMintCertificate(
         uint256 amount,
         address beneficiaryAddress,
         string memory beneficiaryString,
