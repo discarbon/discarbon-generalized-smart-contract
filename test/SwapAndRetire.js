@@ -306,6 +306,57 @@ describe("disCarbonSwapAndRetire", function () {
       await expect(retireContract.retireWithToken(NCTAddress, carbonToRetire, donationPercentage)).to.be.reverted;
     });
   });
+  describe("Test retireAndMintCertificate with MATIC, zero donation", function () {
+    it("Should record the address, retired amount, retire the tokens and mint the certificate", async function () {
+      const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+
+      const maticToSend1 = ethers.utils.parseEther("0.0123");
+      const maticToSend2 = ethers.utils.parseEther("0.0234");
+      const carbonToRetire1 = ethers.utils.parseEther("0.001");
+      const carbonToRetire2 = ethers.utils.parseEther("0.002");
+      const donationPercentage = 0; // TODO
+      const donationAmount = ethers.utils.parseEther("0");
+      const beneficiaryAddress1 = deployer.address;
+      const beneficiaryString1 = "Deployer"
+      const beneficiaryAddress2 = otherAccount.address;
+      const beneficiaryString2 = "otherAccount"
+      const retirementMessage = "Testing specification of beneficiary address, beneficiary string and retirement message."
+
+      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+
+      // Retire from first address
+      let txResponse = await retireContract.retireAndMintCertificateWithMatic(carbonToRetire1, donationPercentage, beneficiaryAddress1, beneficiaryString1, retirementMessage, { value: maticToSend1 });
+      let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
+      expect(recordedAddress).to.equal(deployer.address);
+      let retirement1 = await retireContract.beneficiaryRetirements(deployer.address);
+      expect(retirement1).to.equal(carbonToRetire1);
+      let totalCarbonRetired = await retireContract.totalCarbonRetired();
+      expect(totalCarbonRetired).to.equal(retirement1);
+
+      let txReceipt = await txResponse.wait();
+      await testRetirementCertificatesOwnership(txReceipt, beneficiaryAddress1);
+      await testCarbonRetirementEvent(txReceipt, carbonToRetire1, "Matic");
+
+      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
+      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      expect(NCTBalanceChange).to.equal(donationAmount);
+
+      // Retire from second address
+      txResponse = await retireContract.connect(otherAccount).retireAndMintCertificateWithMatic(carbonToRetire2, donationPercentage, beneficiaryAddress2, beneficiaryString2, retirementMessage,{ value: maticToSend2 });
+      expect(await retireContract.retirementBeneficiaryAddresses(1)).to.equal(otherAccount.address);
+      let retirement2 = await retireContract.beneficiaryRetirements(otherAccount.address);
+      expect(retirement2).to.equal(carbonToRetire2);
+
+      txReceipt = await txResponse.wait();
+      await testRetirementCertificatesOwnership(txReceipt, beneficiaryAddress2);
+      await testCarbonRetirementEvent(txReceipt, carbonToRetire2, "Matic");
+
+      totalCarbonRetired = await retireContract.totalCarbonRetired();
+      expect(totalCarbonRetired).to.equal(carbonToRetire1.add(carbonToRetire2));
+
+    });
+  });
 })
 
 async function fundWalletWithTokens(AddressToFund, amount) {
@@ -343,3 +394,30 @@ async function fundWalletWithSingleToken(tokenAddress, tokenWhaleAddress, addres
 
   await tokenContract.connect(tokenWhaleSigner).transfer(addressToFund, amount);
 }
+
+async function testCarbonRetirementEvent(txReceipt, carbonAmountRetired, tokenOrCoin) {
+  const CarbonRetiredEvents = txReceipt.events.filter(function (event) { return event.event == "CarbonRetired" });
+  if (CarbonRetiredEvents.length !== 1) {
+    throw `Only expected one CarbonRetired event, but ${CarbonRetiredEvents.length} events were emitted.`;
+  }
+  expect(carbonAmountRetired).to.equal(CarbonRetiredEvents[0].args.carbonAmountRetired);
+  expect(tokenOrCoin).to.equal(CarbonRetiredEvents[0].args.tokenOrCoin);
+}
+
+async function testRetirementCertificatesOwnership(txReceipt, beneficiaryAddress) {
+  const retirementCertificates = new ethers.Contract(retirementCertificatesAddress, RetirementCertificatesABI, ethers.provider);
+  const retirementCertificatesContract = retirementCertificates.connect(beneficiaryAddress);
+  const certificateBalance = await retirementCertificatesContract.balanceOf(beneficiaryAddress);
+
+  if (certificateBalance == 0) {
+    throw "The beneficiary does not own any ERC721s from the RetirementCertificate contract.";
+  }
+
+  const ERC721ReceivedEvents = txReceipt.events.filter(function (event) { return event.event == "ERC721Received" });
+  for (const event of ERC721ReceivedEvents) {
+    const tokenId = event.args.tokenId;
+    const owner = await retirementCertificatesContract.ownerOf(tokenId);
+    expect(owner).to.equal(beneficiaryAddress)
+  }
+}
+
