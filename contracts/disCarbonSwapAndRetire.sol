@@ -55,8 +55,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     ///@dev Needed, otherwise uniswap router for matic fails
     fallback() external payable {}
 
-    /// @notice Receives Matic, swaps to carbon token and retires the swapped
-    ///         tokens via autoRedeem. Forwards donations in carbon tokens.
+    /// @notice Receives Matic, swaps to carbon token, retires the swapped tokens via autoRedeem2
+    ///         and mints the retirement certificate. Forwards donations in carbon tokens.
     ///         Returns any excess Matic.
     /// @param carbonAmountToRetire The number of carbon tokens to be retired.
     /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
@@ -96,8 +96,9 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         emit CarbonRetired("Matic", carbonAmountToRetire);
     }
 
-    /// @notice Takes a user approved token, swaps to carbon token and retires the
-    ///         swapped tokens via autoRedeem. Only takes as many tokens as needed.
+    /// @notice Takes a user approved token, swaps to carbon token, retires the swapped tokens
+    ///         via autoRedeem2 and mints the certificate. Forwards donations in carbon tokens.
+    ///         Only takes as many tokens as needed.
     /// @param fromToken Address of the erc20 token sent to buy carbon tokens with.
     /// @param carbonAmountToRetire The number of carbon tokens to be retired.
     /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
