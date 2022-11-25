@@ -55,6 +55,27 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     ///@dev Needed, otherwise uniswap router for matic fails
     fallback() external payable {}
 
+    /// @notice Receives Matic, swaps to carbon token, retires the swapped tokens via autoRedeem2.
+    ///         Forwards donations in carbon tokens. Returns any excess Matic.
+    /// @param carbonAmountToRetire The number of carbon tokens to be retired.
+    /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
+    /// @return tco2Addresses An array of the TCO2 addresses that were retired.
+    /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
+    function retireWithMatic(uint256 carbonAmountToRetire, uint256 donationPercentage)
+        public
+        payable
+        returns (address[] memory tco2Addresses, uint256[] memory tco2Amounts)
+    {
+        uint256 carbonAmountWithDonation = addDonation(carbonAmountToRetire, donationPercentage);
+        swapMaticToCarbonToken(carbonAmountWithDonation);
+        doAccounting(carbonAmountToRetire, tx.origin);
+        (tco2Addresses, tco2Amounts) = retire(carbonAmountToRetire);
+        uint256 carbonAmountToDonate = carbonAmountWithDonation - carbonAmountToRetire;
+        forwardDonation(carbonAmountToDonate);
+        returnExcessMatic();
+        emit CarbonRetired("Matic", carbonAmountToRetire);
+    }
+
     /// @notice Receives Matic, swaps to carbon token, retires the swapped tokens via autoRedeem2
     ///         and mints the retirement certificate. Forwards donations in carbon tokens.
     ///         Returns any excess Matic.
@@ -94,6 +115,36 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         forwardDonation(carbonAmountToDonate);
         returnExcessMatic();
         emit CarbonRetired("Matic", carbonAmountToRetire);
+    }
+
+    /// @notice Takes a user approved token, swaps to carbon token, retires the swapped tokens
+    ///         via autoRedeem2. Forwards donations in carbon tokens. Only takes as many tokens as
+    ///         needed.
+    /// @param fromToken Address of the erc20 token sent to buy carbon tokens with.
+    /// @param carbonAmountToRetire The number of carbon tokens to be retired.
+    /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
+    /// @return tco2Addresses An array of the TCO2 addresses that were retired.
+    /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
+    function retireWithToken(
+        address fromToken,
+        uint256 carbonAmountToRetire,
+        uint256 donationPercentage
+    ) public returns (address[] memory tco2Addresses, uint256[] memory tco2Amounts) {
+        uint256 carbonAmountWithDonation = addDonation(carbonAmountToRetire, donationPercentage);
+
+        if (fromToken == NCTAddress) {
+            // Directly transfer NCT tokens.
+            IERC20(fromToken).safeTransferFrom(msg.sender, address(this), carbonAmountWithDonation);
+        } else {
+            // for all other tokens do a swap.
+            swapTokenToCarbonToken(fromToken, carbonAmountWithDonation);
+        }
+
+        doAccounting(carbonAmountToRetire, tx.origin);
+        (tco2Addresses, tco2Amounts) = retire(carbonAmountToRetire);
+        uint256 carbonAmountToDonate = carbonAmountWithDonation - carbonAmountToRetire;
+        forwardDonation(carbonAmountToDonate);
+        emit CarbonRetired("Token", carbonAmountToRetire);
     }
 
     /// @notice Takes a user approved token, swaps to carbon token, retires the swapped tokens
@@ -359,6 +410,24 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             tco2CertificateTokenIds[i] = lastRetirementCertificateTokenId;
         }
         return (tco2Addresses, tco2Amounts, tco2CertificateTokenIds);
+    }
+
+    /// @notice Redeems the specified amount of NCT for lowest scored TCO2 and retires it.
+    /// @param amount Amount of NCT to redeem and retire.
+    /// @return tco2Addresses An array of the TCO2 addresses that were retired.
+    /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
+    function retire(uint256 amount) private returns (address[] memory, uint256[] memory) {
+        IToucanPoolToken NCTPoolToken = IToucanPoolToken(NCTAddress);
+        (address[] memory tco2Addresses, uint256[] memory tco2Amounts) = NCTPoolToken.redeemAuto2(
+            amount
+        );
+
+        for (uint256 i; i < tco2Addresses.length; i++) {
+            if (tco2Amounts[i] > 0) {
+                IToucanCarbonOffsets(tco2Addresses[i]).retire(tco2Amounts[i]);
+            }
+        }
+        return (tco2Addresses, tco2Amounts);
     }
 
     /// @notice Forwards the donation to the disCarbon multisig.
