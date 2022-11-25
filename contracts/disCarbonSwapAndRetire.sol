@@ -339,6 +339,35 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         require(success, "refund failed");
     }
 
+    /// @notice Remove the entries equal to zero in amounts and the corresponding entries in addresses
+    function removeEntriesWhereAmountsIsZero(address[] memory addresses, uint256[] memory amounts)
+        private
+        pure
+        returns (address[] memory, uint256[] memory)
+    {
+        uint256 zeroCount;
+        for (uint256 i; i < amounts.length; i++) {
+            if (amounts[i] == 0) {
+                zeroCount++;
+            }
+        }
+        if (zeroCount == 0) {
+            return (addresses, amounts);
+        }
+
+        address[] memory addressesNonZero = new address[](amounts.length - zeroCount);
+        uint256[] memory amountsNonZero = new uint256[](amounts.length - zeroCount);
+        uint256 pos;
+        for (uint256 i; i < amounts.length; i++) {
+            if (amounts[i] != 0) {
+                addressesNonZero[pos] = addresses[i];
+                amountsNonZero[pos] = amounts[i];
+                pos++;
+            }
+        }
+        return (addressesNonZero, amountsNonZero);
+    }
+
     /// @notice Redeems the specified amount of NCT for lowest scored TCO2, retires it and mints the
     ///         retirement certificate.
     /// @param amount Amount of NCT to redeem and retire.
@@ -356,38 +385,40 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     )
         private
         returns (
-            address[] memory tco2Addresses,
-            uint256[] memory tco2Amounts,
-            uint256[] memory tco2CertificateTokenIds
+            address[] memory,
+            uint256[] memory,
+            uint256[] memory
         )
     {
         IToucanPoolToken NCTPoolToken = IToucanPoolToken(NCTAddress);
-        (tco2Addresses, tco2Amounts) = NCTPoolToken.redeemAuto2(amount);
+        (address[] memory tco2Addresses, uint256[] memory tco2Amounts) = NCTPoolToken.redeemAuto2(
+            amount
+        );
 
         IRetirementCertificates retirementCertificates = IRetirementCertificates(
             ToucanRetirementCertificateAddress
         );
 
-        uint256 tco2Counter;
+        // Remove tco2s with zero amounts, cf https://github.com/ToucanProtocol/contracts/issues/5
+        (tco2Addresses, tco2Amounts) = removeEntriesWhereAmountsIsZero(tco2Addresses, tco2Amounts);
+
+        uint256[] memory tco2CertificateTokenIds = new uint256[](tco2Amounts.length);
         for (uint256 i; i < tco2Addresses.length; i++) {
-            if (tco2Amounts[i] > 0) {
-                IToucanCarbonOffsets(tco2Addresses[i]).retireAndMintCertificate(
-                    "disCarbon Generalized Retirement Contract",
-                    beneficiaryAddress,
-                    beneficiaryString,
-                    retirementMessage,
-                    tco2Amounts[i]
-                );
-                retirementCertificates.safeTransferFrom(
-                    address(this),
-                    beneficiaryAddress,
-                    lastRetirementCertificateTokenId
-                );
-                tco2Counter++;
-                tco2CertificateTokenIds = new uint256[](tco2Counter);
-                tco2CertificateTokenIds[tco2Counter - 1] = lastRetirementCertificateTokenId;
-            }
+            IToucanCarbonOffsets(tco2Addresses[i]).retireAndMintCertificate(
+                "disCarbon Generalized Retirement Contract",
+                beneficiaryAddress,
+                beneficiaryString,
+                retirementMessage,
+                tco2Amounts[i]
+            );
+            retirementCertificates.safeTransferFrom(
+                address(this),
+                beneficiaryAddress,
+                lastRetirementCertificateTokenId
+            );
+            tco2CertificateTokenIds[i] = lastRetirementCertificateTokenId;
         }
+        return (tco2Addresses, tco2Amounts, tco2CertificateTokenIds);
     }
 
     /// @notice Forwards the donation to the disCarbon multisig.
