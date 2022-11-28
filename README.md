@@ -11,7 +11,8 @@ This smart contract is planned to do the following tasks:
 6. Claim the NFT from Toucan
 
 A more detailed description of the methods in the contract can be found in the
-[automatically generated documentation](docs/disCarbonSwapAndRetire.md).
+[automatically generated documentation](docs/disCarbonSwapAndRetire.md). We use
+[dodoc](https://www.npmjs.com/package/@primitivefi/hardhat-dodoc) to generate it.
 
 The contract is not yet deployed:
 
