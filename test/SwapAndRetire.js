@@ -105,6 +105,41 @@ describe("disCarbonSwapAndRetire", function () {
       expect(DonationBalanceChange).to.equal(donationAmount);
     });
   });
+  describe("Test retire with USDC with donation", function () {
+    it("Should record the address & amount and retire the tokens", async function () {
+      const { retireContract, deployer } = await loadFixture(deployRetireContract);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+      const USDC = new ethers.Contract(USDCAddress, ERC20ABI, ethers.provider);
+
+      const fundingAmount = ethers.utils.parseEther("50");
+      await fundWalletWithTokens(deployer.address, fundingAmount);
+      const carbonToRetire = ethers.utils.parseEther("0.1");
+      const donationPercentage = 4;
+      const donationAmount = (carbonToRetire.mul(donationPercentage)).div(100);
+
+
+      // normal retirement
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
+      let USDCEstimated = await retireContract.calculateNeededAmount(USDCAddress, carbonToRetire.add(donationAmount));
+      // console.log("USDC: ", USDCEstimated);
+      await USDC.connect(deployer).approve(retireContract.address, USDCEstimated);
+      await expect(retireContract.retireWithToken(USDCAddress, carbonToRetire, donationPercentage))
+        .to.emit(retireContract, "CarbonRetired")
+        .withArgs("Token", carbonToRetire);
+
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
+
+      // Check accounting
+      let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
+      expect(recordedAddress).to.equal(deployer.address);
+      let carbonAmountRetired = await retireContract.beneficiaryRetirements(deployer.address);
+      expect(carbonAmountRetired).to.equal(carbonToRetire);
+
+      // Check balances sent to donation address
+      expect(DonationBalanceChange).to.equal(donationAmount);
+    });
+  });
   describe("Test estimate function", function () {
     it("Should record the address, pooled amount and retire the tokens", async function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
