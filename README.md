@@ -5,7 +5,7 @@ This smart contract is planned to do the following tasks:
 
 1. Receive/Get coins/tokens from the user.
 2. Exchange for carbon token (NCT) on sushiswap.
-3. Swap for TCO2 token from a project (default or user selectd).
+3. Swap for TCO2 token from a project (default or user selected).
 4. Retire TCO2s.
 5. Store the attendee address and offset amount.
 6. Claim the NFT from Toucan

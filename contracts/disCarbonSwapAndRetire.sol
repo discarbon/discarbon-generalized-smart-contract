@@ -448,7 +448,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         _from;
         _tokenId;
         _data;
-        // Hack/wordkaround: Save the id of received token so we can transfer it to the retirement
+        // Hack/workaround: Save the id of received token so we can transfer it to the retirement
         // beneficiary
         lastRetirementCertificateTokenId = _tokenId;
         emit ERC721Received(msg.sender, _tokenId);
