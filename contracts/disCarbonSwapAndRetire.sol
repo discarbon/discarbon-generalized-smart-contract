@@ -221,16 +221,16 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @notice Calculates the amount of carbon tokens that need to be swapped
     ///         including donations.
     /// @param carbonAmountToRetire Carbon amount that needs to be retired.
-    /// @param donatioPercentage The given donation percentage which needs
+    /// @param donationPercentage The given donation percentage which needs
     ///         to be added.
     /// @return carbonAmountWithDonation How many carbon tokens need to be
     ///         received from swap to have enough for the donation.
-    function addDonation(uint256 carbonAmountToRetire, uint256 donatioPercentage)
+    function addDonation(uint256 carbonAmountToRetire, uint256 donationPercentage)
         public
         pure
         returns (uint256)
     {
-        uint256 carbonAmountWithDonation = (carbonAmountToRetire * (100 + donatioPercentage)) / 100;
+        uint256 carbonAmountWithDonation = (carbonAmountToRetire * (100 + donationPercentage)) / 100;
         return carbonAmountWithDonation;
     }
 

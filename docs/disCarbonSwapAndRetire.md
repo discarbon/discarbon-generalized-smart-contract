@@ -13,7 +13,7 @@ This contract exchanges the coins/tokens of the user for carbon         tokens (
 ### addDonation
 
 ```solidity
-function addDonation(uint256 carbonAmountToRetire, uint256 donatioPercentage) external pure returns (uint256)
+function addDonation(uint256 carbonAmountToRetire, uint256 donationPercentage) external pure returns (uint256)
 ```
 
 Calculates the amount of carbon tokens that need to be swapped         including donations.
@@ -25,7 +25,7 @@ Calculates the amount of carbon tokens that need to be swapped         including
 | Name | Type | Description |
 |---|---|---|
 | carbonAmountToRetire | uint256 | Carbon amount that needs to be retired. |
-| donatioPercentage | uint256 | The given donation percentage which needs         to be added. |
+| donationPercentage | uint256 | The given donation percentage which needs         to be added. |
 
 #### Returns
 
