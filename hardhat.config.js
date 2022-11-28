@@ -23,9 +23,8 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: "https://polygon-rpc.com",
-        // url: "https://polygon-mainnet.g.alchemy.com/v2/" + process.env.ALCHEMY_POLYGON_API_KEY,
-        blockNumber: 30713275  // July 14th 2022, around 12:20 UTC
+        url: "https://polygon-mainnet.g.alchemy.com/v2/" + process.env.ALCHEMY_POLYGON_API_KEY,
+        blockNumber: 35713480, // Nov 17th 2022, around 08:58 UTC
       }
     },
     polygon: {

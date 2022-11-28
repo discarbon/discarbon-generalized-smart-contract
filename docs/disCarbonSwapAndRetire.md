@@ -33,6 +33,28 @@ Calculates the amount of carbon tokens that need to be swapped         including
 |---|---|---|
 | _0 | uint256 | carbonAmountWithDonation How many carbon tokens need to be         received from swap to have enough for the donation. |
 
+### beneficiaryRetirements
+
+```solidity
+function beneficiaryRetirements(address) external view returns (uint256)
+```
+
+The total amount of carbon retired by each beneficiary
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### calculateNeededAmount
 
 ```solidity
@@ -56,13 +78,13 @@ Calculates the needed amount of coins/tokens.         the swapped tokens.
 |---|---|---|
 | _0 | uint256 | tokenAmountNeeded How many tokens/coins needed for buying the needed         carbon tokens. |
 
-### contributions
+### callerRetirements
 
 ```solidity
-function contributions(address) external view returns (uint256)
+function callerRetirements(address) external view returns (uint256)
 ```
 
-Stores all contributions (summed up) for each address
+The total amount of carbon retired by each address that has called this contract
 
 
 
@@ -77,28 +99,6 @@ Stores all contributions (summed up) for each address
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | undefined |
-
-### contributorsAddresses
-
-```solidity
-function contributorsAddresses(uint256) external view returns (address)
-```
-
-An array of addresses which have contributed
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
 
 ### donationAddress
 
@@ -117,13 +117,13 @@ Address to where the donations are sent to
 |---|---|---|
 | _0 | address | undefined |
 
-### getContributorsAddresses
+### getRetirementCallerAddresses
 
 ```solidity
-function getContributorsAddresses() external view returns (address[])
+function getRetirementCallerAddresses() external view returns (address[])
 ```
 
-A getter function for the array with all the contributors addresses.
+A getter function for the array holding all addresses that have retired via this contract.
 
 
 
@@ -132,15 +132,15 @@ A getter function for the array with all the contributors addresses.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address[] | contributorsAddresses An array (can be empty) with all addresses which contributed. |
+| _0 | address[] | retireeAddresses An array (can be empty) of all addresses that have retired. |
 
-### getContributorsCount
+### getRetirementCallerCount
 
 ```solidity
-function getContributorsCount() external view returns (uint256)
+function getRetirementCallerCount() external view returns (uint256)
 ```
 
-A function to get the number of contributors.
+A function to get the number of addresses that have retired via this contract.
 
 
 
@@ -149,15 +149,97 @@ A function to get the number of contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 A number which is the length of the contributorsAddresses array. |
+| _0 | uint256 | uint256 The length of the retireeAddresses array. |
+
+### onERC721Received
+
+```solidity
+function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes _data) external nonpayable returns (bytes4)
+```
+
+
+
+*Required for use with safeTransferFrom() (from OpenZeppelin&#39;s ERC721 contract) used      by Toucan&#39;s RetirementCertificates in order to transfer the ERC721 retirement      certificates to this contract).*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _operator | address | undefined |
+| _from | address | undefined |
+| _tokenId | uint256 | undefined |
+| _data | bytes | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes4 | undefined |
+
+### retireAndMintCertificateWithMatic
+
+```solidity
+function retireAndMintCertificateWithMatic(uint256 carbonAmountToRetire, uint256 donationPercentage, address beneficiaryAddress, string beneficiaryString, string retirementMessage) external payable returns (address[] tco2Addresses, uint256[] tco2Amounts, uint256[] tco2CertificateTokenIds)
+```
+
+Receives Matic, swaps to carbon token, retires the swapped tokens via autoRedeem2         and mints the retirement certificate. Forwards donations in carbon tokens.         Returns any excess Matic.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| carbonAmountToRetire | uint256 | The number of carbon tokens to be retired. |
+| donationPercentage | uint256 | Donation as a percentage 1 = 1% added for donation. |
+| beneficiaryAddress | address | The retirement beneficiary to specify in the retirement certificate. |
+| beneficiaryString | string | The retirement beneficiary name to specify in the retirement certificate. |
+| retirementMessage | string | The retirement message to specify in the retirement certificate. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| tco2Addresses | address[] | An array of the TCO2 addresses that were retired. |
+| tco2Amounts | uint256[] | An array of the amounts of each TCO2 that was retired. |
+| tco2CertificateTokenIds | uint256[] | An array of the corresponding retirement certificate ids. |
+
+### retireAndMintCertificateWithToken
+
+```solidity
+function retireAndMintCertificateWithToken(address fromToken, uint256 carbonAmountToRetire, uint256 donationPercentage, address beneficiaryAddress, string beneficiaryString, string retirementMessage) external nonpayable returns (address[] tco2Addresses, uint256[] tco2Amounts, uint256[] tco2CertificateTokenIds)
+```
+
+Takes a user approved token, swaps to carbon token, retires the swapped tokens         via autoRedeem2 and mints the certificate. Forwards donations in carbon tokens.         Only takes as many tokens as needed.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| fromToken | address | Address of the erc20 token sent to buy carbon tokens with. |
+| carbonAmountToRetire | uint256 | The number of carbon tokens to be retired. |
+| donationPercentage | uint256 | Donation as a percentage 1 = 1% added for donation. |
+| beneficiaryAddress | address | The retirement beneficiary to specify in the retirement certificate. |
+| beneficiaryString | string | The retirement beneficiary name to specify in the retirement certificate. |
+| retirementMessage | string | The retirement message to specify in the retirement certificate. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| tco2Addresses | address[] | An array of the TCO2 addresses that were retired. |
+| tco2Amounts | uint256[] | An array of the amounts of each TCO2 that was retired. |
+| tco2CertificateTokenIds | uint256[] | An array of the corresponding retirement certificate ids. |
 
 ### retireWithMatic
 
 ```solidity
-function retireWithMatic(uint256 carbonAmountToRetire, uint256 donationPercentage) external payable
+function retireWithMatic(uint256 carbonAmountToRetire, uint256 donationPercentage) external payable returns (address[] tco2Addresses, uint256[] tco2Amounts)
 ```
 
-Receives Matic, swaps to carbon token and retires the carbon         tokens. Forwards donations in carbon tokens. Returns any excess Matic.
+Receives Matic, swaps to carbon token, retires the swapped tokens via autoRedeem2.         Forwards donations in carbon tokens. Returns any excess Matic.
 
 
 
@@ -165,16 +247,23 @@ Receives Matic, swaps to carbon token and retires the carbon         tokens. For
 
 | Name | Type | Description |
 |---|---|---|
-| carbonAmountToRetire | uint256 | The number of carbon tokens that need to be retired. |
+| carbonAmountToRetire | uint256 | The number of carbon tokens to be retired. |
 | donationPercentage | uint256 | Donation as a percentage 1 = 1% added for donation. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| tco2Addresses | address[] | An array of the TCO2 addresses that were retired. |
+| tco2Amounts | uint256[] | An array of the amounts of each TCO2 that was retired. |
 
 ### retireWithToken
 
 ```solidity
-function retireWithToken(address fromToken, uint256 carbonAmountToRetire, uint256 donationPercentage) external nonpayable
+function retireWithToken(address fromToken, uint256 carbonAmountToRetire, uint256 donationPercentage) external nonpayable returns (address[] tco2Addresses, uint256[] tco2Amounts)
 ```
 
-Takes user approved token, swaps to carbon token and retires         the swapped tokens. Forwards donations in carbon tokens Only         takes as many tokens as needed.
+Takes a user approved token, swaps to carbon token, retires the swapped tokens         via autoRedeem2. Forwards donations in carbon tokens. Only takes as many tokens as         needed.
 
 
 
@@ -182,17 +271,68 @@ Takes user approved token, swaps to carbon token and retires         the swapped
 
 | Name | Type | Description |
 |---|---|---|
-| fromToken | address | Address of the token that is used to swap from. |
-| carbonAmountToRetire | uint256 | The number of carbon tokens that need to be forwarded. |
+| fromToken | address | Address of the erc20 token sent to buy carbon tokens with. |
+| carbonAmountToRetire | uint256 | The number of carbon tokens to be retired. |
 | donationPercentage | uint256 | Donation as a percentage 1 = 1% added for donation. |
 
-### totalCarbonPooled
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| tco2Addresses | address[] | An array of the TCO2 addresses that were retired. |
+| tco2Amounts | uint256[] | An array of the amounts of each TCO2 that was retired. |
+
+### retirementBeneficiaryAddresses
 
 ```solidity
-function totalCarbonPooled() external view returns (uint256)
+function retirementBeneficiaryAddresses(uint256) external view returns (address)
 ```
 
-Sum of all contributions
+An array of addresses that have been specified as retirement beneficiaries
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+
+### retirementCallerAddresses
+
+```solidity
+function retirementCallerAddresses(uint256) external view returns (address)
+```
+
+An array of addresses which have retired carbon by calling this contract
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+
+### totalCarbonRetired
+
+```solidity
+function totalCarbonRetired() external view returns (uint256)
+```
+
+The total amount of carbon retired via this contract
 
 
 
@@ -207,13 +347,13 @@ Sum of all contributions
 
 ## Events
 
-### ContributionSent
+### CarbonRetired
 
 ```solidity
-event ContributionSent(string tokenOrCoin, uint256 carbonTokenContributed)
+event CarbonRetired(string tokenOrCoin, uint256 carbonAmountRetired)
 ```
 
-Emitted after carbon tokens have been sent to pooling address.
+Emitted after carbon tokens have been retired.
 
 
 
@@ -222,7 +362,24 @@ Emitted after carbon tokens have been sent to pooling address.
 | Name | Type | Description |
 |---|---|---|
 | tokenOrCoin  | string | undefined |
-| carbonTokenContributed  | uint256 | undefined |
+| carbonAmountRetired  | uint256 | undefined |
+
+### ERC721Received
+
+```solidity
+event ERC721Received(address indexed sender, uint256 tokenId)
+```
+
+Emitted when an ERC721 is transferred to this retirement contract.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| sender `indexed` | address | The address that sent the ERC721. |
+| tokenId  | uint256 | The ERC721 token ID sent. |
 
 
 
