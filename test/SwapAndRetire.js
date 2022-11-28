@@ -57,7 +57,7 @@ describe("disCarbonSwapAndRetire", function () {
       const donationAmount = ethers.utils.parseEther("0");
 
       // Retire from first address
-      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
 
       await expect(retireContract.retireWithMatic(carbonToRetire1, donationPercentage, { value: maticToSend1 }))
         .to.emit(retireContract, "CarbonRetired")
@@ -69,9 +69,9 @@ describe("disCarbonSwapAndRetire", function () {
       let totalCarbonRetired = await retireContract.totalCarbonRetired();
       expect(totalCarbonRetired).to.equal(retirement1);
 
-      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
-      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
-      expect(NCTBalanceChange).to.equal(donationAmount);
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
+      expect(DonationBalanceChange).to.equal(donationAmount);
 
       // Retire from second address
       await retireContract.connect(otherAccount).retireWithMatic(carbonToRetire2, donationPercentage, { value: maticToSend2 });
@@ -93,7 +93,7 @@ describe("disCarbonSwapAndRetire", function () {
       const donationAmount = ethers.utils.parseEther("0"); // TODO
 
       // store state before transactions:
-      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
 
       // Retire
       let maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire);
@@ -104,9 +104,9 @@ describe("disCarbonSwapAndRetire", function () {
 
       await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, { value: reducedMaticAmount })).to.be.revertedWith("Not enough Matic to swap to required carbon Token");
 
-      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
-      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
-      expect(NCTBalanceChange).to.equal(donationAmount);
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
+      expect(DonationBalanceChange).to.equal(donationAmount);
 
     });
   });
@@ -123,7 +123,7 @@ describe("disCarbonSwapAndRetire", function () {
       const carbonToDonate = ethers.utils.parseEther("0"); // TODO
 
       // normal retirement
-      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
       let USDCEstimated = await retireContract.calculateNeededAmount(USDCAddress, carbonToRetire);
       // console.log("USDC: ", USDCEstimated);
       await USDC.connect(deployer).approve(retireContract.address, USDCEstimated);
@@ -131,8 +131,8 @@ describe("disCarbonSwapAndRetire", function () {
       .to.emit(retireContract, "CarbonRetired")
       .withArgs("Token", carbonToRetire);
 
-      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
-      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
 
       // Check accounting
       let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
@@ -141,7 +141,7 @@ describe("disCarbonSwapAndRetire", function () {
       expect(carbonAmountRetired).to.equal(carbonToRetire);
 
       // Check balances sent to donation address
-      expect(NCTBalanceChange).to.equal(carbonToDonate);
+      expect(DonationBalanceChange).to.equal(carbonToDonate);
 
       // Approve less than estimated and see that it fails
       USDCEstimated = await retireContract.calculateNeededAmount(USDCAddress, carbonToRetire);
@@ -162,7 +162,7 @@ describe("disCarbonSwapAndRetire", function () {
       const carbonToDonate = ethers.utils.parseEther("0"); // TODO
 
       // normal retirement
-      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
       let WMATICEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire);
       // console.log("WMATIC: ", WMATICEstimated);
       await WMATIC.connect(deployer).approve(retireContract.address, WMATICEstimated);
@@ -170,8 +170,8 @@ describe("disCarbonSwapAndRetire", function () {
       .to.emit(retireContract, "CarbonRetired")
       .withArgs("Token", carbonToRetire);
 
-      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
-      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
 
       // Check accounting
       let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
@@ -180,7 +180,7 @@ describe("disCarbonSwapAndRetire", function () {
       expect(carbonAmountRetired).to.equal(carbonToRetire);
 
       // Check balances sent to pooling address
-      expect(NCTBalanceChange).to.equal(carbonToDonate);
+      expect(DonationBalanceChange).to.equal(carbonToDonate);
 
       // Approve less than estimated and see that it fails
       WMATICEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire);
@@ -201,7 +201,7 @@ describe("disCarbonSwapAndRetire", function () {
       const carbonToDonate = ethers.utils.parseEther("0"); // TODO
 
       // normal contribution
-      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
       let DAIEstimated = await retireContract.calculateNeededAmount(DAIAddress, carbonToRetire);
       // console.log("DAI: ", DAIEstimated);
       await DAI.connect(deployer).approve(retireContract.address, DAIEstimated);
@@ -209,8 +209,8 @@ describe("disCarbonSwapAndRetire", function () {
       .to.emit(retireContract, "CarbonRetired")
       .withArgs("Token", carbonToRetire);
 
-      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
-      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
 
       // Check accounting
       let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
@@ -219,7 +219,7 @@ describe("disCarbonSwapAndRetire", function () {
       expect(carbonAmountRetired).to.equal(carbonToRetire);
 
       // Check balances sent to pooling address
-      expect(NCTBalanceChange).to.equal(carbonToDonate);
+      expect(DonationBalanceChange).to.equal(carbonToDonate);
 
       // Approve less than estimated and see that it fails
       DAIEstimated = await retireContract.calculateNeededAmount(DAIAddress, carbonToRetire);
@@ -240,7 +240,7 @@ describe("disCarbonSwapAndRetire", function () {
       const carbonToDonate = ethers.utils.parseEther("0"); // TODO
 
       // normal contribution
-      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
       let WETHEstimated = await retireContract.calculateNeededAmount(WETHAddress, carbonToRetire);
       // console.log("WETH: ", WETHEstimated);
       await WETH.connect(deployer).approve(retireContract.address, WETHEstimated);
@@ -248,8 +248,8 @@ describe("disCarbonSwapAndRetire", function () {
       .to.emit(retireContract, "CarbonRetired")
       .withArgs("Token", carbonToRetire);
 
-      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
-      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
 
       // Check accounting
       let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
@@ -258,7 +258,7 @@ describe("disCarbonSwapAndRetire", function () {
       expect(carbonAmountRetired).to.equal(carbonToRetire);
 
       // Check balances sent to pooling address
-      expect(NCTBalanceChange).to.equal(carbonToDonate);
+      expect(DonationBalanceChange).to.equal(carbonToDonate);
 
       // Approve less than estimated and see that it fails
       WETHEstimated = await retireContract.calculateNeededAmount(WETHAddress, carbonToRetire);
@@ -278,7 +278,7 @@ describe("disCarbonSwapAndRetire", function () {
       const carbonToDonate = ethers.utils.parseEther("0"); // TODO
 
       // normal contribution
-      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
       let NCTEstimated = await retireContract.calculateNeededAmount(NCTAddress, carbonToRetire);
       // console.log("NCT: ", NCTEstimated);
       await NCT.connect(deployer).approve(retireContract.address, NCTEstimated);
@@ -286,8 +286,8 @@ describe("disCarbonSwapAndRetire", function () {
       .to.emit(retireContract, "CarbonRetired")
       .withArgs("Token", carbonToRetire);
 
-      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
-      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
 
       // Check accounting
       let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
@@ -296,7 +296,7 @@ describe("disCarbonSwapAndRetire", function () {
       expect(carbonAmountRetired).to.equal(carbonToRetire);
 
       // Check balances sent to pooling address
-      expect(NCTBalanceChange).to.equal(carbonToDonate);
+      expect(DonationBalanceChange).to.equal(carbonToDonate);
 
       // Approve less than estimated and see that it fails
       NCTEstimated = await retireContract.calculateNeededAmount(NCTAddress, carbonToRetire);
@@ -323,7 +323,7 @@ describe("disCarbonSwapAndRetire", function () {
       const beneficiaryString2 = "otherAccount"
       const retirementMessage = "Testing specification of beneficiary address, beneficiary string and retirement message."
 
-      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
 
       // Retire from first address
       let txResponse = await retireContract.retireAndMintCertificateWithMatic(carbonToRetire1, donationPercentage, beneficiaryAddress1, beneficiaryString1, retirementMessage, { value: maticToSend1 });
@@ -338,9 +338,9 @@ describe("disCarbonSwapAndRetire", function () {
       await testRetirementCertificatesOwnership(txReceipt, beneficiaryAddress1);
       await testCarbonRetirementEvent(txReceipt, carbonToRetire1, "Matic");
 
-      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
-      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
-      expect(NCTBalanceChange).to.equal(donationAmount);
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
+      expect(DonationBalanceChange).to.equal(donationAmount);
 
       // Retire from second address
       txResponse = await retireContract.connect(otherAccount).retireAndMintCertificateWithMatic(carbonToRetire2, donationPercentage, beneficiaryAddress2, beneficiaryString2, retirementMessage,{ value: maticToSend2 });
@@ -365,7 +365,7 @@ describe("disCarbonSwapAndRetire", function () {
 
       const fundingAmount = ethers.utils.parseEther("50");
       await fundWalletWithTokens(deployer.address, fundingAmount);
-      await fundWalletWithTokens(otherAccount.address, fundingAmount);      
+      await fundWalletWithTokens(otherAccount.address, fundingAmount);
 
       const carbonToRetire1 = ethers.utils.parseEther("0.1");
       const carbonToRetire2 = ethers.utils.parseEther("0.2");
@@ -377,7 +377,7 @@ describe("disCarbonSwapAndRetire", function () {
       const beneficiaryString2 = "otherAccount"
       const retirementMessage = "Testing specification of beneficiary address, beneficiary string and retirement message."
 
-      const NCTBalanceBefore = await NCT.balanceOf(donationAddress);
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
 
       // Retire from first address
       let WMATICEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire1);
@@ -395,9 +395,9 @@ describe("disCarbonSwapAndRetire", function () {
       await testRetirementCertificatesOwnership(txReceipt, beneficiaryAddress1);
       await testCarbonRetirementEvent(txReceipt, carbonToRetire1, "Token");
 
-      NCTBalanceAfter = await NCT.balanceOf(donationAddress);
-      NCTBalanceChange = NCTBalanceAfter.sub(NCTBalanceBefore);
-      expect(NCTBalanceChange).to.equal(donationAmount);
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
+      expect(DonationBalanceChange).to.equal(donationAmount);
 
       // Retire from second address
       WMATICEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire2);
