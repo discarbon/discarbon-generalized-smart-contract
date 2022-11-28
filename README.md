@@ -12,7 +12,7 @@ This smart contract is planned to do the following tasks:
 
 A more detailed description of the methods in the contract can be found in the
 [automatically generated documentation](docs/disCarbonSwapAndRetire.md). We use
-[dodoc](https://www.npmjs.com/package/@primitivefi/hardhat-dodoc) to generate it.
+[dodoc](https://github.com/primitivefinance/primitive-dodoc) to generate it.
 
 The contract is not yet deployed:
 
