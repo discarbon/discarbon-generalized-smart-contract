@@ -306,57 +306,6 @@ describe("disCarbonSwapAndRetire", function () {
       await expect(retireContract.retireWithToken(NCTAddress, carbonToRetire, donationPercentage)).to.be.reverted;
     });
   });
-  describe("Test retireAndMintCertificate with MATIC, zero donation", function () {
-    it("Should record the address, retired amount, retire the tokens and mint the certificate", async function () {
-      const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
-      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
-
-      const maticToSend1 = ethers.utils.parseEther("0.0123");
-      const maticToSend2 = ethers.utils.parseEther("0.0234");
-      const carbonToRetire1 = ethers.utils.parseEther("0.001");
-      const carbonToRetire2 = ethers.utils.parseEther("0.002");
-      const donationPercentage = 0; // TODO
-      const carbonToDonate = ethers.utils.parseEther("0");
-      const beneficiaryAddress1 = deployer.address;
-      const beneficiaryString1 = "Deployer"
-      const beneficiaryAddress2 = otherAccount.address;
-      const beneficiaryString2 = "otherAccount"
-      const retirementMessage = "Testing specification of beneficiary address, beneficiary string and retirement message."
-
-      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
-
-      // Retire from first address
-      let txResponse = await retireContract.retireAndMintCertificateWithMatic(carbonToRetire1, donationPercentage, beneficiaryAddress1, beneficiaryString1, retirementMessage, { value: maticToSend1 });
-      let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
-      expect(recordedAddress).to.equal(deployer.address);
-      let retirement1 = await retireContract.beneficiaryRetirements(deployer.address);
-      expect(retirement1).to.equal(carbonToRetire1);
-      let totalCarbonRetired = await retireContract.totalCarbonRetired();
-      expect(totalCarbonRetired).to.equal(retirement1);
-
-      let txReceipt = await txResponse.wait();
-      await testRetirementCertificatesOwnership(txReceipt, beneficiaryAddress1);
-      await testCarbonRetirementEvent(txReceipt, carbonToRetire1, "Matic");
-
-      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
-      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
-      expect(DonationBalanceChange).to.equal(carbonToDonate);
-
-      // Retire from second address
-      txResponse = await retireContract.connect(otherAccount).retireAndMintCertificateWithMatic(carbonToRetire2, donationPercentage, beneficiaryAddress2, beneficiaryString2, retirementMessage, { value: maticToSend2 });
-      expect(await retireContract.retirementBeneficiaryAddresses(1)).to.equal(otherAccount.address);
-      let retirement2 = await retireContract.beneficiaryRetirements(otherAccount.address);
-      expect(retirement2).to.equal(carbonToRetire2);
-
-      txReceipt = await txResponse.wait();
-      await testRetirementCertificatesOwnership(txReceipt, beneficiaryAddress2);
-      await testCarbonRetirementEvent(txReceipt, carbonToRetire2, "Matic");
-
-      totalCarbonRetired = await retireContract.totalCarbonRetired();
-      expect(totalCarbonRetired).to.equal(carbonToRetire1.add(carbonToRetire2));
-
-    });
-  });
   describe("Test retire using MATIC with donation", function () {
     it("Should record the address, retired amount, retire the tokens", async function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
@@ -412,6 +361,57 @@ describe("disCarbonSwapAndRetire", function () {
 
       // Check balances sent to donation address
       expect(DonationBalanceChange).to.equal(carbonToDonate);
+    });
+  });
+  describe("Test retireAndMintCertificate with MATIC, zero donation", function () {
+    it("Should record the address, retired amount, retire the tokens and mint the certificate", async function () {
+      const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
+      const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
+
+      const maticToSend1 = ethers.utils.parseEther("0.0123");
+      const maticToSend2 = ethers.utils.parseEther("0.0234");
+      const carbonToRetire1 = ethers.utils.parseEther("0.001");
+      const carbonToRetire2 = ethers.utils.parseEther("0.002");
+      const donationPercentage = 0; // TODO
+      const carbonToDonate = ethers.utils.parseEther("0");
+      const beneficiaryAddress1 = deployer.address;
+      const beneficiaryString1 = "Deployer"
+      const beneficiaryAddress2 = otherAccount.address;
+      const beneficiaryString2 = "otherAccount"
+      const retirementMessage = "Testing specification of beneficiary address, beneficiary string and retirement message."
+
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
+
+      // Retire from first address
+      let txResponse = await retireContract.retireAndMintCertificateWithMatic(carbonToRetire1, donationPercentage, beneficiaryAddress1, beneficiaryString1, retirementMessage, { value: maticToSend1 });
+      let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
+      expect(recordedAddress).to.equal(deployer.address);
+      let retirement1 = await retireContract.beneficiaryRetirements(deployer.address);
+      expect(retirement1).to.equal(carbonToRetire1);
+      let totalCarbonRetired = await retireContract.totalCarbonRetired();
+      expect(totalCarbonRetired).to.equal(retirement1);
+
+      let txReceipt = await txResponse.wait();
+      await testRetirementCertificatesOwnership(txReceipt, beneficiaryAddress1);
+      await testCarbonRetirementEvent(txReceipt, carbonToRetire1, "Matic");
+
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
+      expect(DonationBalanceChange).to.equal(carbonToDonate);
+
+      // Retire from second address
+      txResponse = await retireContract.connect(otherAccount).retireAndMintCertificateWithMatic(carbonToRetire2, donationPercentage, beneficiaryAddress2, beneficiaryString2, retirementMessage, { value: maticToSend2 });
+      expect(await retireContract.retirementBeneficiaryAddresses(1)).to.equal(otherAccount.address);
+      let retirement2 = await retireContract.beneficiaryRetirements(otherAccount.address);
+      expect(retirement2).to.equal(carbonToRetire2);
+
+      txReceipt = await txResponse.wait();
+      await testRetirementCertificatesOwnership(txReceipt, beneficiaryAddress2);
+      await testCarbonRetirementEvent(txReceipt, carbonToRetire2, "Matic");
+
+      totalCarbonRetired = await retireContract.totalCarbonRetired();
+      expect(totalCarbonRetired).to.equal(carbonToRetire1.add(carbonToRetire2));
+
     });
   });
   describe("Test retireAndMintCertificate with Token (WMATIC), zero donation", function () {
