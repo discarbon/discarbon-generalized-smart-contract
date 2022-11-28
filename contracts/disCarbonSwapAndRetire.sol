@@ -70,8 +70,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         swapMaticToCarbonToken(carbonAmountWithDonation);
         doAccounting(carbonAmountToRetire, tx.origin);
         (tco2Addresses, tco2Amounts) = retire(carbonAmountToRetire);
-        uint256 carbonAmountToDonate = carbonAmountWithDonation - carbonAmountToRetire;
-        forwardDonation(carbonAmountToDonate);
+        forwardDonation();
         returnExcessMatic();
         emit CarbonRetired("Matic", carbonAmountToRetire);
     }
@@ -111,8 +110,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             beneficiaryString,
             retirementMessage
         );
-        uint256 carbonAmountToDonate = carbonAmountWithDonation - carbonAmountToRetire;
-        forwardDonation(carbonAmountToDonate);
+        forwardDonation();
         returnExcessMatic();
         emit CarbonRetired("Matic", carbonAmountToRetire);
     }
@@ -142,8 +140,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
 
         doAccounting(carbonAmountToRetire, tx.origin);
         (tco2Addresses, tco2Amounts) = retire(carbonAmountToRetire);
-        uint256 carbonAmountToDonate = carbonAmountWithDonation - carbonAmountToRetire;
-        forwardDonation(carbonAmountToDonate);
+        forwardDonation();
         emit CarbonRetired("Token", carbonAmountToRetire);
     }
 
@@ -191,8 +188,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             beneficiaryString,
             retirementMessage
         );
-        uint256 carbonAmountToDonate = carbonAmountWithDonation - carbonAmountToRetire;
-        forwardDonation(carbonAmountToDonate);
+        forwardDonation();
         emit CarbonRetired("Token", carbonAmountToRetire);
     }
 
@@ -431,8 +427,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     }
 
     /// @notice Forwards the donation to the disCarbon multisig.
-    function forwardDonation(uint256 carbonAmountToDonate) private {
-        IERC20(NCTAddress).transfer(donationAddress, carbonAmountToDonate);
+    function forwardDonation() private {
+        IERC20(NCTAddress).transfer(donationAddress, IERC20(NCTAddress).balanceOf(address(this)));
     }
 
     /// @dev Required for use with safeTransferFrom() (from OpenZeppelin's ERC721 contract) used
