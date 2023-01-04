@@ -418,10 +418,12 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             amount
         );
 
+        // Remove tco2s with zero amounts, cf https://github.com/ToucanProtocol/contracts/issues/5
+        (tco2Addresses, tco2Amounts) = removeEntriesWhereAmountsIsZero(tco2Addresses, tco2Amounts);
+
+
         for (uint256 i; i < tco2Addresses.length; i++) {
-            if (tco2Amounts[i] > 0) {
-                IToucanCarbonOffsets(tco2Addresses[i]).retire(tco2Amounts[i]);
-            }
+            IToucanCarbonOffsets(tco2Addresses[i]).retire(tco2Amounts[i]);
         }
         return (tco2Addresses, tco2Amounts);
     }
