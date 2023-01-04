@@ -66,3 +66,7 @@ Manual deployment can be done by first:
 and then verify the contract:
 
 `hh verify 0xb6A5D547d0A325Ffa0357E2698eB76E165b606BA --network polygon`
+
+## Addresses
+
+The contract has been deployed on 2022.01.04 to [0xfa30d296f5BeB0859EA35899cBe3076fBD41281D](https://polygonscan.com/address/0xfa30d296f5BeB0859EA35899cBe3076fBD41281D)

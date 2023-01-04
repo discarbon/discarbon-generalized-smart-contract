@@ -12,7 +12,7 @@ async function main() {
 
   await retireContract.deployed();
 
-  console.log("Pooling deployed:", retireContract.address);
+  console.log("Contract deployed:", retireContract.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
