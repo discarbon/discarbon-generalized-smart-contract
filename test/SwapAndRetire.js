@@ -95,8 +95,12 @@ describe("disCarbonSwapAndRetire", function () {
       // store state before transactions:
       const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
 
+      // Test 0 amount to retire:
+      let maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, "0");
+      expect(maticEstimated).to.equal(0);
+
       // Retire
-      let maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire);
+      maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire);
       await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, { value: maticEstimated })).not.to.be.reverted;
 
       maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire);

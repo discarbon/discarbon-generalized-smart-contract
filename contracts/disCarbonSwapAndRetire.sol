@@ -204,10 +204,16 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         view
         returns (uint256)
     {
+        // Handle 0 amount
+        if (carbonAmountToRetire == 0) {
+            return carbonAmountToRetire;
+        }
+
         // if NCT is supplied no swap necessary
         if (fromToken == NCTAddress) {
             return carbonAmountToRetire;
         }
+
 
         address[] memory path = makePath(fromToken);
 
