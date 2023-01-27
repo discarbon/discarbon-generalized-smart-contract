@@ -178,6 +178,28 @@ function onERC721Received(address _operator, address _from, uint256 _tokenId, by
 |---|---|---|
 | _0 | bytes4 | undefined |
 
+### redemptionFee
+
+```solidity
+function redemptionFee(uint256 carbonAmountToRetire) external pure returns (uint256)
+```
+
+Calculates the redemptionFees
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| carbonAmountToRetire | uint256 | Carbon amount that needs to be retired. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### retireAndMintCertificateWithMatic
 
 ```solidity

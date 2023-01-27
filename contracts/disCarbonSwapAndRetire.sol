@@ -87,7 +87,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         uint256 donationPercentage
     ) public payable {
         uint256 carbonAmountToSwap = addDonation(carbonAmountToRetire, donationPercentage);
-        carbonAmountToSwap += carbonAmountToRetire / 9;
+        carbonAmountToSwap += redemptionFee(carbonAmountToRetire);
         swapMaticToCarbonToken(carbonAmountToSwap);
         doAccounting(carbonAmountToRetire, tx.origin);
         retireSpecific(tco2Address, carbonAmountToRetire);
@@ -240,7 +240,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         }
 
         if (fees) {
-            carbonAmountToSwap += carbonAmountToRetire / 9;
+            carbonAmountToSwap += redemptionFee(carbonAmountToRetire);
         }
 
         // if NCT is supplied no swap necessary
@@ -272,6 +272,16 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         uint256 carbonAmountWithDonation = (carbonAmountToRetire * (100 + donationPercentage)) /
             100;
         return carbonAmountWithDonation;
+    }
+
+        /// @notice Calculates the redemptionFees
+    /// @param carbonAmountToRetire Carbon amount that needs to be retired.
+    function redemptionFee(uint256 carbonAmountToRetire)
+        public
+        pure
+        returns (uint256)
+    {
+        return carbonAmountToRetire / 9;
     }
 
     /// @notice A getter function for the array holding all addresses that have retired via this contract.
@@ -477,7 +487,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         address[] memory tco2Addresses = new address[](1);
         uint256[] memory carbonAmountsToRetireWithFee = new uint256[](1);
         tco2Addresses[0] = tco2Address;
-        carbonAmountsToRetireWithFee[0] = carbonAmountToRetire * 10 / 9;
+        carbonAmountsToRetireWithFee[0] = carbonAmountToRetire + redemptionFee(carbonAmountToRetire);
 
         require(
             carbonAmountsToRetireWithFee[0] <= IERC20(tco2Address).balanceOf(NCTAddress),
