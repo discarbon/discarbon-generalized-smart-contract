@@ -219,16 +219,21 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param fromToken Address of the token that is used to swap from.
     ///        To estimate Matic tokens, use WMATIC address.
     /// @param carbonAmountToRetire Carbon Amount that needs to be purchased.
+    /// @param fees a boolean to include fees for specific project redemption in cost estimation
     /// @return tokenAmountNeeded How many tokens/coins needed for buying the needed
     ///         carbon tokens.
-    function calculateNeededAmount(address fromToken, uint256 carbonAmountToRetire)
-        public
-        view
-        returns (uint256)
-    {
+    function calculateNeededAmount(
+        address fromToken,
+        uint256 carbonAmountToRetire,
+        bool fees
+    ) public view returns (uint256) {
         // Handle 0 amount
         if (carbonAmountToRetire == 0) {
             return carbonAmountToRetire;
+        }
+
+        if (fees) {
+            carbonAmountToRetire = (carbonAmountToRetire * 10) / 9;
         }
 
         // if NCT is supplied no swap necessary
