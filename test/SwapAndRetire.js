@@ -317,17 +317,22 @@ describe("disCarbonSwapAndRetire", function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
       const NCT = new ethers.Contract(NCTAddress, ERC20ABI, ethers.provider);
 
-      const maticToSend1 = ethers.utils.parseEther("0.0123");
-      const carbonToRetire1 = ethers.utils.parseEther("0.001");
+      // const maticToSend1 = ethers.utils.parseEther("0.0123");
+      const carbonToRetire = ethers.utils.parseEther("0.001");
       const donationPercentage = 3;
-      const carbonToDonate = (carbonToRetire1.mul(donationPercentage)).div(100);
+      const carbonToDonate = (carbonToRetire.mul(donationPercentage)).div(100);
+      maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire, donationPercentage, false);
+
+      // send slightly less than estimated
+      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, { value: maticEstimated.mul(999).div(1000) }))
+      .to.be.reverted;
 
       // Retire from first address
       const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
 
-      await expect(retireContract.retireWithMatic(carbonToRetire1, donationPercentage, { value: maticToSend1 }))
+      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, { value: maticEstimated }))
         .to.emit(retireContract, "CarbonRetired")
-        .withArgs("Matic", carbonToRetire1);
+        .withArgs("Matic", carbonToRetire);
 
       DonationBalanceAfter = await NCT.balanceOf(donationAddress);
       DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
@@ -355,15 +360,14 @@ describe("disCarbonSwapAndRetire", function () {
 
       const feeRedeemPercentageInBase = await NCT.feeRedeemPercentageInBase();
       const feeRedeemDivider = await NCT.feeRedeemDivider();
-      console.log("feeRedeemPercentageInBase: ", feeRedeemPercentageInBase);
-      console.log("feeredeemdivider: ", feeRedeemDivider);
+      // console.log("feeRedeemPercentageInBase: ", feeRedeemPercentageInBase);
+      // console.log("feeredeemdivider: ", feeRedeemDivider);
       const carbonToRetireWithFees = carbonToRetire.mul(feeRedeemDivider).div(feeRedeemDivider.sub(feeRedeemPercentageInBase));
       const redemptionFees = carbonToRetireWithFees.sub(carbonToRetire);
 
       const donationPercentage = 3;
       const carbonToDonate = (carbonToRetire.mul(donationPercentage)).div(100);
       maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire, donationPercentage, true);
-      NCTEstimated = await retireContract.calculateNeededAmount(NCTAddress, carbonToRetire, donationPercentage, true);
 
       const tco2SupplyBefore = await tco2Contract.totalSupply()
       const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
