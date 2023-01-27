@@ -484,7 +484,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
 
         require(
             carbonAmountsToRetireWithFee[0] <= IERC20(tco2Address).balanceOf(NCTAddress),
-            "Insuffcient tco2 available in pool"
+            "Insufficient tco2 available in pool"
         );
 
         IToucanPoolToken NCTPoolToken = IToucanPoolToken(NCTAddress);
