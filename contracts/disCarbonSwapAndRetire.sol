@@ -236,7 +236,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         uint256 carbonAmountToSwap = carbonAmountToRetire;
 
         if (donationPercentage != 0) {
-            carbonAmountToSwap += (carbonAmountToRetire * 3) / 100;
+            carbonAmountToSwap = addDonation(carbonAmountToRetire, donationPercentage);
         }
 
         if (fees) {
