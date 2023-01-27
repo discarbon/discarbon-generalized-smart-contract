@@ -374,7 +374,11 @@ describe("disCarbonSwapAndRetire", function () {
 
       // console.log("carbonToRetire: ",carbonToRetire, "redemptionFees: ", redemptionFees, "donationPercentage: ", donationPercentage, "maticEstimated: ", maticEstimated, "NCTEstimated: ", NCTEstimated)
 
-      await expect(retireContract.retireSpecificTco2WithMatic(tco2Address, carbonToRetire, redemptionFees, donationPercentage, { value: maticEstimated }))
+      // send slightly less than estimated
+      await expect(retireContract.retireSpecificTco2WithMatic(tco2Address, carbonToRetire, donationPercentage, { value: maticEstimated.mul(999).div(1000) }))
+      .to.be.reverted;
+
+      await expect(retireContract.retireSpecificTco2WithMatic(tco2Address, carbonToRetire, donationPercentage, { value: maticEstimated }))
         .to.emit(retireContract, "CarbonRetired")
         .withArgs("Matic", carbonToRetire);
 

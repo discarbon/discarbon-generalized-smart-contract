@@ -80,18 +80,17 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     ///         excess Matic.
     /// @param tco2Address The TCO2 address to redeem and retire credits from.
     /// @param carbonAmountToRetire The amount of the TCO2 token to retire (excluding fees).
-    /// @param redemptionFee The pre-calculated redemption fee charged when redeeming the TCO2 token.
     /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
     function retireSpecificTco2WithMatic(
         address tco2Address,
         uint256 carbonAmountToRetire,
-        uint256 redemptionFee,
         uint256 donationPercentage
     ) public payable {
-        uint256 carbonAmountWithDonation = addDonation(carbonAmountToRetire, donationPercentage);
-        swapMaticToCarbonToken(carbonAmountWithDonation + redemptionFee);
+        uint256 carbonAmountToSwap = addDonation(carbonAmountToRetire, donationPercentage);
+        carbonAmountToSwap += carbonAmountToRetire / 9;
+        swapMaticToCarbonToken(carbonAmountToSwap);
         doAccounting(carbonAmountToRetire, tx.origin);
-        retireSpecific(tco2Address, carbonAmountToRetire, redemptionFee);
+        retireSpecific(tco2Address, carbonAmountToRetire);
         forwardDonation();
         returnExcessMatic();
         emit CarbonRetired("Matic", carbonAmountToRetire);
@@ -471,16 +470,14 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @notice Redeems NCT for the specified amount of a single specific TCO2 and retires it.
     /// @param tco2Address The TCO2 address to redeem and retire credits from.
     /// @param carbonAmountToRetire The amount of the TCO2 token to retire (excluding fees).
-    /// @param redemptionFee The pre-calculated redemption fee charged when redeeming the TCO2 token.
     function retireSpecific(
         address tco2Address,
-        uint256 carbonAmountToRetire,
-        uint256 redemptionFee
+        uint256 carbonAmountToRetire
     ) private {
         address[] memory tco2Addresses = new address[](1);
         uint256[] memory carbonAmountsToRetireWithFee = new uint256[](1);
         tco2Addresses[0] = tco2Address;
-        carbonAmountsToRetireWithFee[0] = carbonAmountToRetire + redemptionFee;
+        carbonAmountsToRetireWithFee[0] = carbonAmountToRetire * 10 / 9;
 
         require(
             carbonAmountsToRetireWithFee[0] <= IERC20(tco2Address).balanceOf(NCTAddress),

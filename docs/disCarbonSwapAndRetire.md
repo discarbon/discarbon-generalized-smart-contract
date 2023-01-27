@@ -238,7 +238,7 @@ Takes a user approved token, swaps to carbon token, retires the swapped tokens  
 ### retireSpecificTco2WithMatic
 
 ```solidity
-function retireSpecificTco2WithMatic(address tco2Address, uint256 carbonAmountToRetire, uint256 redemptionFee, uint256 donationPercentage) external payable
+function retireSpecificTco2WithMatic(address tco2Address, uint256 carbonAmountToRetire, uint256 donationPercentage) external payable
 ```
 
 Receives Matic, swaps to pool token, redeems the pool token for specified TCO2 via         redeemMany() and retires them. Forwards donations in carbon tokens. Returns any         excess Matic.
@@ -251,7 +251,6 @@ Receives Matic, swaps to pool token, redeems the pool token for specified TCO2 v
 |---|---|---|
 | tco2Address | address | The TCO2 address to redeem and retire credits from. |
 | carbonAmountToRetire | uint256 | The amount of the TCO2 token to retire (excluding fees). |
-| redemptionFee | uint256 | The pre-calculated redemption fee charged when redeeming the TCO2 token. |
 | donationPercentage | uint256 | Donation as a percentage 1 = 1% added for donation. |
 
 ### retireWithMatic
