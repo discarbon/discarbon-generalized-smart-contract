@@ -220,11 +220,13 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     ///        To estimate Matic tokens, use WMATIC address.
     /// @param carbonAmountToRetire Carbon Amount that needs to be purchased.
     /// @param fees a boolean to include fees for specific project redemption in cost estimation
+    /// @param donationPercentage The given donation percentage 1 = 1%.
     /// @return tokenAmountNeeded How many tokens/coins needed for buying the needed
     ///         carbon tokens.
     function calculateNeededAmount(
         address fromToken,
         uint256 carbonAmountToRetire,
+        uint256 donationPercentage,
         bool fees
     ) public view returns (uint256) {
         // Handle 0 amount
@@ -232,20 +234,26 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             return carbonAmountToRetire;
         }
 
+        uint256 carbonAmountToSwap = carbonAmountToRetire;
+
+        if (donationPercentage != 0) {
+            carbonAmountToSwap += (carbonAmountToRetire * 3) / 100;
+        }
+
         if (fees) {
-            carbonAmountToRetire = (carbonAmountToRetire * 10) / 9;
+            carbonAmountToSwap += carbonAmountToRetire / 9;
         }
 
         // if NCT is supplied no swap necessary
         if (fromToken == NCTAddress) {
-            return carbonAmountToRetire;
+            return carbonAmountToSwap;
         }
 
         address[] memory path = makePath(fromToken);
 
         IUniswapV2Router02 sushiRouter = IUniswapV2Router02(sushiRouterAddress);
 
-        uint256[] memory tokenAmountNeeded = sushiRouter.getAmountsIn(carbonAmountToRetire, path);
+        uint256[] memory tokenAmountNeeded = sushiRouter.getAmountsIn(carbonAmountToSwap, path);
 
         return tokenAmountNeeded[0];
     }

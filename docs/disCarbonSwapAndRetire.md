@@ -58,7 +58,7 @@ The total amount of carbon retired by each beneficiary
 ### calculateNeededAmount
 
 ```solidity
-function calculateNeededAmount(address fromToken, uint256 carbonAmountToRetire, bool fees) external view returns (uint256)
+function calculateNeededAmount(address fromToken, uint256 carbonAmountToRetire, uint256 donationPercentage, bool fees) external view returns (uint256)
 ```
 
 Calculates the needed amount of coins/tokens.         the swapped tokens.
@@ -71,6 +71,7 @@ Calculates the needed amount of coins/tokens.         the swapped tokens.
 |---|---|---|
 | fromToken | address | Address of the token that is used to swap from.        To estimate Matic tokens, use WMATIC address. |
 | carbonAmountToRetire | uint256 | Carbon Amount that needs to be purchased. |
+| donationPercentage | uint256 | The given donation percentage 1 = 1%. |
 | fees | bool | a boolean to include fees for specific project redemption in cost estimation |
 
 #### Returns
