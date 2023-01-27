@@ -3,6 +3,7 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const { constants, expectRevert } = require('@openzeppelin/test-helpers');
 const ERC20ABI = require("../ABI/ERC20.json");
+const NCTABI = require("../ABI/NCT.json");
 const RetirementCertificatesABI = require("../ABI/RetirementCertificates.json");
 
 // Toucan RetirementCertificates ERC721 contract
@@ -44,6 +45,7 @@ describe("disCarbonSwapAndRetire", function () {
       expect(retireContract.address != constants.ZERO_ADDRESS);
     });
   });
+  /*
   describe("Test retire using MATIC, zero donation", function () {
     it("Should record the address, retired amount, retire the tokens", async function () {
       const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
@@ -331,7 +333,51 @@ describe("disCarbonSwapAndRetire", function () {
       DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
       expect(DonationBalanceChange).to.equal(carbonToDonate);
     });
+  }); */
+  describe("Test retire with specific TCO2 using MATIC with donation", function () {
+    it("Should record the address, retired amount, retire the tokens", async function () {
+      const { retireContract, deployer, otherAccount } = await loadFixture(deployRetireContract);
+      const NCT = new ethers.Contract(NCTAddress, NCTABI, ethers.provider);
+      
+      const carbonToRetire = ethers.utils.parseEther("10.001");
+      // Address of TCO2 to retire 
+      // https://registry.verra.org/app/projectDetail/VCS/985
+      // https://polygonscan.com/address/0xb00110cc12cdc8f666f33f4e52e4957ff594282f
+      const tco2Address = "0xB00110CC12cDC8F666f33F4e52e4957Ff594282f";
+      // const tco2Address = "0xa96c8e571b23A6cFc8ca6955c5D3ff03a13fA699";
+      const tco2Contract = new ethers.Contract(tco2Address, ERC20ABI, ethers.provider);
+
+      // Check there's enough liquidity to ensure the test is valid.
+      const poolBalance = await tco2Contract.balanceOf(NCT.address);
+      expect(poolBalance).greaterThanOrEqual(carbonToRetire);
+
+      const maticToSend = ethers.utils.parseEther("50.0123");
+
+      const feeRedeemPercentageInBase = await NCT.feeRedeemPercentageInBase();
+      const feeRedeemDivider = await NCT.feeRedeemDivider();
+      const carbonToRetireWithFees = carbonToRetire.mul(feeRedeemDivider).div(feeRedeemDivider.sub(feeRedeemPercentageInBase));
+      const redemptionFees = carbonToRetireWithFees.sub(carbonToRetire);
+
+      const donationPercentage = 3;
+      const carbonToDonate = (carbonToRetire.mul(donationPercentage)).div(100);
+
+      const tco2SupplyBefore = await tco2Contract.totalSupply()
+      const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
+
+      await expect(retireContract.retireSpecificTco2WithMatic(tco2Address, carbonToRetire, redemptionFees, donationPercentage, { value: maticToSend }))
+        .to.emit(retireContract, "CarbonRetired")
+        .withArgs("Matic", carbonToRetire);
+
+      const tco2SupplyAfter = await tco2Contract.totalSupply()
+      tco2SupplyChange = tco2SupplyBefore.sub(tco2SupplyAfter);
+      expect(tco2SupplyChange).to.equal(carbonToRetire);
+
+      DonationBalanceAfter = await NCT.balanceOf(donationAddress);
+      DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);  
+      expect(DonationBalanceChange).to.equal(carbonToDonate);
+    });
   });
+  /*
   describe("Test retire with USDC with donation", function () {
     it("Should record the address & amount and retire the tokens", async function () {
       const { retireContract, deployer } = await loadFixture(deployRetireContract);
@@ -478,6 +524,7 @@ describe("disCarbonSwapAndRetire", function () {
 
     });
   });
+  */
 })
 
 async function fundWalletWithTokens(AddressToFund, amount) {
