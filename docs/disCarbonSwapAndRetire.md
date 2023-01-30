@@ -181,10 +181,10 @@ function onERC721Received(address _operator, address _from, uint256 _tokenId, by
 ### redemptionFee
 
 ```solidity
-function redemptionFee(uint256 carbonAmountToRetire) external pure returns (uint256)
+function redemptionFee(uint256 carbonAmountToRetire) external view returns (uint256)
 ```
 
-Calculates the redemptionFees
+Calculates the redemptionFees that needs to be added to exactly redeem carbonAmountToRetire.
 
 
 

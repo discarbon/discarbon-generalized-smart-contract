@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "contracts/interfaces/IToucanPoolToken.sol";
 import "contracts/interfaces/IToucanCarbonOffsets.sol";
 import "contracts/interfaces/IRetirementCertificates.sol";
+import "contracts/interfaces/Interfaces.sol";
 
 /// @title disCarbon generalized swap and retire contract
 /// @author haurog, danceratopz
@@ -274,14 +275,17 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         return carbonAmountWithDonation;
     }
 
-        /// @notice Calculates the redemptionFees
+    /// @notice Calculates the redemptionFees that needs to be added to exactly redeem carbonAmountToRetire.
     /// @param carbonAmountToRetire Carbon amount that needs to be retired.
-    function redemptionFee(uint256 carbonAmountToRetire)
-        public
-        pure
-        returns (uint256)
-    {
-        return carbonAmountToRetire / 9;
+    function redemptionFee(uint256 carbonAmountToRetire) public view returns (uint256) {
+        uint256 feeRedeemDivider = NCTContract(NCTAddress).feeRedeemDivider(); // D in the formula below
+        uint256 feeRedeemPercentageInBase = NCTContract(NCTAddress).feeRedeemPercentageInBase(); // B in the formula below
+
+        // fee = Amount*B/(D-B)
+        uint256 fee = (carbonAmountToRetire * feeRedeemPercentageInBase) /
+            (feeRedeemDivider - feeRedeemPercentageInBase);
+
+        return fee;
     }
 
     /// @notice A getter function for the array holding all addresses that have retired via this contract.
@@ -480,14 +484,13 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @notice Redeems NCT for the specified amount of a single specific TCO2 and retires it.
     /// @param tco2Address The TCO2 address to redeem and retire credits from.
     /// @param carbonAmountToRetire The amount of the TCO2 token to retire (excluding fees).
-    function retireSpecific(
-        address tco2Address,
-        uint256 carbonAmountToRetire
-    ) private {
+    function retireSpecific(address tco2Address, uint256 carbonAmountToRetire) private {
         address[] memory tco2Addresses = new address[](1);
         uint256[] memory carbonAmountsToRetireWithFee = new uint256[](1);
         tco2Addresses[0] = tco2Address;
-        carbonAmountsToRetireWithFee[0] = carbonAmountToRetire + redemptionFee(carbonAmountToRetire);
+        carbonAmountsToRetireWithFee[0] =
+            carbonAmountToRetire +
+            redemptionFee(carbonAmountToRetire);
 
         require(
             carbonAmountsToRetireWithFee[0] <= IERC20(tco2Address).balanceOf(NCTAddress),
