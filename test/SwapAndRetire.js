@@ -61,7 +61,7 @@ describe("disCarbonSwapAndRetire", function () {
       // Retire from first address
       const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
 
-      await expect(retireContract.retireWithMatic(carbonToRetire1, donationPercentage, { value: maticToSend1 }))
+      await expect(retireContract.retireWithMatic(carbonToRetire1, donationPercentage, ethers.constants.AddressZero, { value: maticToSend1 }))
         .to.emit(retireContract, "CarbonRetired")
         .withArgs("Matic", carbonToRetire1);
       let recordedAddress = await retireContract.retirementBeneficiaryAddresses(0);
@@ -76,7 +76,7 @@ describe("disCarbonSwapAndRetire", function () {
       expect(DonationBalanceChange).to.equal(carbonToDonate);
 
       // Retire from second address
-      await retireContract.connect(otherAccount).retireWithMatic(carbonToRetire2, donationPercentage, { value: maticToSend2 });
+      await retireContract.connect(otherAccount).retireWithMatic(carbonToRetire2, donationPercentage, ethers.constants.AddressZero, { value: maticToSend2 });
       expect(await retireContract.retirementBeneficiaryAddresses(1)).to.equal(otherAccount.address);
       let retirement2 = await retireContract.beneficiaryRetirements(otherAccount.address);
       expect(retirement2).to.equal(carbonToRetire2);
@@ -103,12 +103,12 @@ describe("disCarbonSwapAndRetire", function () {
 
       // Retire
       maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire, 0, false);
-      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, { value: maticEstimated })).not.to.be.reverted;
+      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, ethers.constants.AddressZero, { value: maticEstimated })).not.to.be.reverted;
 
       maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire, 0, false);
       let reducedMaticAmount = maticEstimated.sub(ethers.utils.parseEther("0.0000000001"));
 
-      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, { value: reducedMaticAmount })).to.be.revertedWith("Not enough Matic to swap to required carbon Token");
+      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, ethers.constants.AddressZero, { value: reducedMaticAmount })).to.be.revertedWith("Not enough Matic to swap to required carbon Token");
 
       DonationBalanceAfter = await NCT.balanceOf(donationAddress);
       DonationBalanceChange = DonationBalanceAfter.sub(DonationBalanceBefore);
@@ -324,13 +324,13 @@ describe("disCarbonSwapAndRetire", function () {
       maticEstimated = await retireContract.calculateNeededAmount(WMATICAddress, carbonToRetire, donationPercentage, false);
 
       // send slightly less than estimated
-      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, { value: maticEstimated.mul(999).div(1000) }))
+      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, ethers.constants.AddressZero, { value: maticEstimated.mul(999).div(1000) }))
       .to.be.reverted;
 
       // Retire from first address
       const DonationBalanceBefore = await NCT.balanceOf(donationAddress);
 
-      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, { value: maticEstimated }))
+      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, ethers.constants.AddressZero, { value: maticEstimated }))
         .to.emit(retireContract, "CarbonRetired")
         .withArgs("Matic", carbonToRetire);
 
@@ -375,10 +375,10 @@ describe("disCarbonSwapAndRetire", function () {
       // console.log("carbonToRetire: ",carbonToRetire, "redemptionFees: ", redemptionFees, "donationPercentage: ", donationPercentage, "maticEstimated: ", maticEstimated, "NCTEstimated: ", NCTEstimated)
 
       // send slightly less than estimated
-      await expect(retireContract.retireSpecificTco2WithMatic(tco2Address, carbonToRetire, donationPercentage, { value: maticEstimated.mul(999).div(1000) }))
+      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, tco2Address, { value: maticEstimated.mul(999).div(1000) }))
       .to.be.reverted;
 
-      await expect(retireContract.retireSpecificTco2WithMatic(tco2Address, carbonToRetire, donationPercentage, { value: maticEstimated }))
+      await expect(retireContract.retireWithMatic(carbonToRetire, donationPercentage, tco2Address, { value: maticEstimated }))
         .to.emit(retireContract, "CarbonRetired")
         .withArgs("Matic", carbonToRetire);
 
