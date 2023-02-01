@@ -285,7 +285,7 @@ Receives Matic, swaps to carbon token, retires the swapped tokens via autoRedeem
 ### retireWithToken
 
 ```solidity
-function retireWithToken(address fromToken, uint256 carbonAmountToRetire, uint256 donationPercentage) external nonpayable returns (address[] tco2Addresses, uint256[] tco2Amounts)
+function retireWithToken(address fromToken, uint256 carbonAmountToRetire, uint256 donationPercentage, address tco2Address) external nonpayable returns (address[] tco2Addresses, uint256[] tco2Amounts)
 ```
 
 Takes a user approved token, swaps to carbon token, retires the swapped tokens         via autoRedeem2. Forwards donations in carbon tokens. Only takes as many tokens as         needed.
@@ -299,6 +299,7 @@ Takes a user approved token, swaps to carbon token, retires the swapped tokens  
 | fromToken | address | Address of the erc20 token sent to buy carbon tokens with. |
 | carbonAmountToRetire | uint256 | The number of carbon tokens to be retired. |
 | donationPercentage | uint256 | Donation as a percentage 1 = 1% added for donation. |
+| tco2Address | address | The TCO2 address to redeem and retire credits from. If address(0) is supplied it will redeem the default TCO2 in the pool. |
 
 #### Returns
 

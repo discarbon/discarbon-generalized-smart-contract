@@ -126,25 +126,30 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param fromToken Address of the erc20 token sent to buy carbon tokens with.
     /// @param carbonAmountToRetire The number of carbon tokens to be retired.
     /// @param donationPercentage Donation as a percentage 1 = 1% added for donation.
+    /// @param tco2Address The TCO2 address to redeem and retire credits from. If address(0) is supplied it will redeem the default TCO2 in the pool.
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
     function retireWithToken(
         address fromToken,
         uint256 carbonAmountToRetire,
-        uint256 donationPercentage
+        uint256 donationPercentage,
+        address tco2Address
     ) public returns (address[] memory tco2Addresses, uint256[] memory tco2Amounts) {
-        uint256 carbonAmountWithDonation = addDonation(carbonAmountToRetire, donationPercentage);
+        uint256 carbonAmountToSwap = addDonation(carbonAmountToRetire, donationPercentage);
+        if (tco2Address != address(0)) {
+            carbonAmountToSwap += redemptionFee(carbonAmountToRetire);
+        }
 
         if (fromToken == NCTAddress) {
             // Directly transfer NCT tokens.
-            IERC20(fromToken).safeTransferFrom(msg.sender, address(this), carbonAmountWithDonation);
+            IERC20(fromToken).safeTransferFrom(msg.sender, address(this), carbonAmountToSwap);
         } else {
             // for all other tokens do a swap.
-            swapTokenToCarbonToken(fromToken, carbonAmountWithDonation);
+            swapTokenToCarbonToken(fromToken, carbonAmountToSwap);
         }
 
         doAccounting(carbonAmountToRetire, tx.origin);
-        (tco2Addresses, tco2Amounts) = redeemAndRetire(carbonAmountToRetire, address(0));
+        (tco2Addresses, tco2Amounts) = redeemAndRetire(carbonAmountToRetire, tco2Address);
         forwardDonation();
         emit CarbonRetired("Token", carbonAmountToRetire);
     }
@@ -459,7 +464,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
 
         IToucanPoolToken NCTPoolToken = IToucanPoolToken(NCTAddress);
 
-        if (tco2Address == address(0)) { // get the lowest scoring TCO2 from Pool
+        if (tco2Address == address(0)) {
+            // get the lowest scoring TCO2 from Pool
             (tco2Addresses, tco2Amounts) = NCTPoolToken.redeemAuto2(carbonAmountToRetire);
 
             // Remove tco2s with zero amounts, cf https://github.com/ToucanProtocol/contracts/issues/5
@@ -471,7 +477,8 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
             for (uint256 i; i < tco2Addresses.length; i++) {
                 IToucanCarbonOffsets(tco2Addresses[i]).retire(tco2Amounts[i]);
             }
-        } else { // get the specified TCO2
+        } else {
+            // get the specified TCO2
             tco2Addresses = new address[](1);
             tco2Amounts = new uint256[](1);
             tco2Addresses[0] = tco2Address;
