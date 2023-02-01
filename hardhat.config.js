@@ -1,6 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv/config")
 require('@primitivefi/hardhat-dodoc');  // creates docs from every time one compiles
+require("hardhat-gas-reporter");
 
 
 // You need to export an object to set up your config
@@ -36,5 +37,10 @@ module.exports = {
     runOnCompile: true,
     debugMode: false,
     exclude: ['interfaces', 'types', '@openzeppelin'],
+  },
+  gasReporter: {
+    currency: 'ETH',
+    gasPrice: 30,
+    enabled: true
   }
 };
