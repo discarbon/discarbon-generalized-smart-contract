@@ -63,24 +63,18 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
     /// @param tco2Address The TCO2 address to redeem and retire credits from. If address(0) is supplied it will redeem the default TCO2 in the pool.
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
-    function retireWithMatic(uint256 carbonAmountToRetire, uint256 donationPercentage, address tco2Address)
-        public
-        payable
-        returns (address[] memory tco2Addresses, uint256[] memory tco2Amounts)
-    {
+    function retireWithMatic(
+        uint256 carbonAmountToRetire,
+        uint256 donationPercentage,
+        address tco2Address
+    ) public payable returns (address[] memory tco2Addresses, uint256[] memory tco2Amounts) {
         uint256 carbonAmountToSwap = addDonation(carbonAmountToRetire, donationPercentage);
-        if (tco2Address != address(0)){
+        if (tco2Address != address(0)) {
             carbonAmountToSwap += redemptionFee(carbonAmountToRetire);
         }
         swapMaticToCarbonToken(carbonAmountToSwap);
         doAccounting(carbonAmountToRetire, tx.origin);
-
-        if (tco2Address != address(0)){
-            (tco2Addresses, tco2Amounts) = retireSpecific(tco2Address, carbonAmountToRetire);
-        } else {
-            (tco2Addresses, tco2Amounts) = retire(carbonAmountToRetire);
-        }
-
+        (tco2Addresses, tco2Amounts) = redeemAndRetire(carbonAmountToRetire, tco2Address);
         forwardDonation();
         returnExcessMatic();
         emit CarbonRetired("Matic", carbonAmountToRetire);
@@ -150,7 +144,7 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         }
 
         doAccounting(carbonAmountToRetire, tx.origin);
-        (tco2Addresses, tco2Amounts) = retire(carbonAmountToRetire);
+        (tco2Addresses, tco2Amounts) = redeemAndRetire(carbonAmountToRetire, address(0));
         forwardDonation();
         emit CarbonRetired("Token", carbonAmountToRetire);
     }
@@ -451,47 +445,53 @@ contract disCarbonSwapAndRetire is IERC721Receiver {
         return (tco2Addresses, tco2Amounts, tco2CertificateTokenIds);
     }
 
-    /// @notice Redeems the specified amount of NCT for lowest scored TCO2 and retires it.
-    /// @param amount Amount of NCT to redeem and retire.
+    /// @notice Redeems the needed NCT, automatically adds fees if needed and retires it.
+    /// @param carbonAmountToRetire Amount of NCT to to be retired.
+    /// @param tco2Address Address for a specific TCO2 to redeem tokens from. If address(0) is supplied redeems the lowest scored TCO2 in the pool.
     /// @return tco2Addresses An array of the TCO2 addresses that were retired.
     /// @return tco2Amounts An array of the amounts of each TCO2 that was retired.
-    function retire(uint256 amount) private returns (address[] memory, uint256[] memory) {
+    function redeemAndRetire(uint256 carbonAmountToRetire, address tco2Address)
+        private
+        returns (address[] memory, uint256[] memory)
+    {
+        address[] memory tco2Addresses;
+        uint256[] memory tco2Amounts;
+
         IToucanPoolToken NCTPoolToken = IToucanPoolToken(NCTAddress);
-        (address[] memory tco2Addresses, uint256[] memory tco2Amounts) = NCTPoolToken.redeemAuto2(
-            amount
-        );
 
-        // Remove tco2s with zero amounts, cf https://github.com/ToucanProtocol/contracts/issues/5
-        (tco2Addresses, tco2Amounts) = removeEntriesWhereAmountsIsZero(tco2Addresses, tco2Amounts);
+        if (tco2Address == address(0)) { // get the lowest scoring TCO2 from Pool
+            (tco2Addresses, tco2Amounts) = NCTPoolToken.redeemAuto2(carbonAmountToRetire);
 
-        for (uint256 i; i < tco2Addresses.length; i++) {
-            IToucanCarbonOffsets(tco2Addresses[i]).retire(tco2Amounts[i]);
+            // Remove tco2s with zero amounts, cf https://github.com/ToucanProtocol/contracts/issues/5
+            (tco2Addresses, tco2Amounts) = removeEntriesWhereAmountsIsZero(
+                tco2Addresses,
+                tco2Amounts
+            );
+
+            for (uint256 i; i < tco2Addresses.length; i++) {
+                IToucanCarbonOffsets(tco2Addresses[i]).retire(tco2Amounts[i]);
+            }
+        } else { // get the specified TCO2
+            tco2Addresses = new address[](1);
+            tco2Amounts = new uint256[](1);
+            tco2Addresses[0] = tco2Address;
+            tco2Amounts[0] = carbonAmountToRetire;
+
+            require(
+                tco2Amounts[0] <= IERC20(tco2Address).balanceOf(NCTAddress),
+                "Insufficient tco2 available in pool"
+            );
+
+            // We will only receive carbon amount without the fee due to redemption fees.
+            uint256[] memory carbonAmountsToRetireWithFee = new uint256[](1);
+            carbonAmountsToRetireWithFee[0] =
+                carbonAmountToRetire +
+                redemptionFee(carbonAmountToRetire);
+            NCTPoolToken.redeemMany(tco2Addresses, carbonAmountsToRetireWithFee);
+            IToucanCarbonOffsets(tco2Address).retire(carbonAmountToRetire);
         }
+
         return (tco2Addresses, tco2Amounts);
-    }
-
-    /// @notice Redeems NCT for the specified amount of a single specific TCO2 and retires it.
-    /// @param tco2Address The TCO2 address to redeem and retire credits from.
-    /// @param carbonAmountToRetire The amount of the TCO2 token to retire (excluding fees).
-    function retireSpecific(address tco2Address, uint256 carbonAmountToRetire) private returns (address[] memory, uint256[] memory) {
-        address[] memory tco2Addresses = new address[](1);
-        uint256[] memory carbonAmountsToRetireWithFee = new uint256[](1);
-        tco2Addresses[0] = tco2Address;
-        carbonAmountsToRetireWithFee[0] =
-            carbonAmountToRetire +
-            redemptionFee(carbonAmountToRetire);
-
-        require(
-            carbonAmountsToRetireWithFee[0] <= IERC20(tco2Address).balanceOf(NCTAddress),
-            "Insufficient tco2 available in pool"
-        );
-
-        IToucanPoolToken NCTPoolToken = IToucanPoolToken(NCTAddress);
-        // We will only receive carbon amount without the fee due to redemption fees.
-        NCTPoolToken.redeemMany(tco2Addresses, carbonAmountsToRetireWithFee);
-        IToucanCarbonOffsets(tco2Address).retire(carbonAmountToRetire);
-
-        return (tco2Addresses, carbonAmountsToRetireWithFee);
     }
 
     /// @notice Forwards the donation to the disCarbon multisig.
