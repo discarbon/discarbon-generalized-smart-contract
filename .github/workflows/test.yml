@@ -43,9 +43,11 @@ jobs:
       run: |
         echo RPC_URL=https://polygon-rpc.com >> $GITHUB_ENV 
         echo LATEST_BLOCK_NUMBER=`curl https://polygon-rpc.com -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' | jq  -r .result` >> $GITHUB_ENV
+        echo RECENT_BLOCK_NUMBER=$(($LATEST_BLOCK_NUMBER - 0x20)) >> $GITHUB_ENV
 
     - name: Run tests on a fork from a very recent block
       run: |
-        # Use a slightly older block with 32 confirmations
-        npx hardhat node --fork $RPC_URL --fork-block-number $(($LATEST_BLOCK_NUMBER - 0x20)) > /dev/null &
+        echo "Forking from block number $RECENT_BLOCK_NUMBER"RECENT_BLOCK_NUMBER=$(($LATEST_BLOCK_NUMBER - 0x40)) 
+        # Use a slightly older block with 64 confirmations
+        npx hardhat node --fork $RPC_URL --fork-block-number $RECENT_BLOCK_NUMBER > /dev/null &
         npx hardhat test --network localhost
