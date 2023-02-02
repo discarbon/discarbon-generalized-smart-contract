@@ -15,7 +15,7 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: process.env.RPC_URL,
+        url: process.env.POLYGON_RPC_URL,
         blockNumber: 38824166, // https://polygonscan.com/block/38824166 Feb-02-2023 01:30:00 PM +UTC
       }
     },
