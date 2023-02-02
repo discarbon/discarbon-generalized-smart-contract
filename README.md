@@ -69,4 +69,4 @@ and then verify the contract:
 
 ## Addresses
 
-The contract has been deployed on 2022.01.04 to [0x1358715aCdAF547584974aa533AF754607747cDB](https://polygonscan.com/address/0x1358715aCdAF547584974aa533AF754607747cDB)
+The contract has been deployed on 2023.02.02 to [0x96F2244A8094a4B1F57257e0641A94a6B13C8827](https://polygonscan.com/address/0x96F2244A8094a4B1F57257e0641A94a6B13C8827)
