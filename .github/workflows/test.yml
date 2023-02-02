@@ -17,12 +17,32 @@ jobs:
     environment: hardhat tests
     steps:
     - uses: actions/checkout@v3
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm install
-    - run: cp .github/workflows/env_github_actions .env
-    - run: npx hardhat compile
-    - run: npx hardhat test
+
+    - name: Install command-line deps
+      run: sudo apt install jq
+
+    - name: Install hardhat/node packages
+      run: npm install
+
+    - name: Create dotenv file
+      run: cp .github/workflows/env_github_actions .env
+
+    - name: Compile contracts
+      run: npx hardhat compile
+
+    - name: Run tests using the fork specified by hardhat.config.js
+      run: npx hardhat test
+
+    -name: Run tests on a fork from a very recent block
+      run:
+        RPC_URL=https://polygon-rpc.com
+        BLOCK_NUMBER=`curl $RPC_URL -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' | jq  -r .result`
+        # Use a slightly older block with 32 confirmations
+        npx hardhat node --fork $RPC_URL --fork-block-number $(($LATEST_BLOCK_NUMBER - 0x40)) > /dev/null &
+        npx hardhat test --network localhost
