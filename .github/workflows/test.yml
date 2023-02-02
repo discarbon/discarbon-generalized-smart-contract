@@ -39,7 +39,7 @@ jobs:
     - name: Run tests using the fork specified by hardhat.config.js
       run: npx hardhat test
 
-    -name: Run tests on a fork from a very recent block
+    - name: Run tests on a fork from a very recent block
       run:
         RPC_URL=https://polygon-rpc.com
         BLOCK_NUMBER=`curl $RPC_URL -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' | jq  -r .result`
