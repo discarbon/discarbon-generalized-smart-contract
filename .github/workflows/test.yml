@@ -51,5 +51,5 @@ jobs:
     - name: Run tests on a fork from a very recent block
       run: |
         echo "Forking from block number ${RECENT_BLOCK_NUMBER}"
-        npx hardhat node --fork $RPC_URL --fork-block-number $RECENT_BLOCK_NUMBER > /dev/null &
+        npx hardhat node --fork $RPC_URL --fork-block-number $RECENT_BLOCK_NUMBER &
         npx hardhat test --network localhost
