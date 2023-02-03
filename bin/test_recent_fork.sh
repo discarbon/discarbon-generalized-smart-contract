@@ -27,7 +27,14 @@ node_exit_code=$?
 
 sleep 2
 
-test_output=`npx hardhat test --network localhost $TEST_EXTRA_ARGS 2>&1 | tee /dev/tty`
+echo "Running in ci: $CI"
+if [[ $CI == "true" ]]; then
+    TERMINAL=/dev/null  # /dev/tty not available in github actins/docker
+else
+    TERMINAL=/dev/tty
+fi
+
+test_output=`npx hardhat test --network localhost $TEST_EXTRA_ARGS 2>&1 | tee $TERMINAL`
 test_exit_code=$?
 
 kill $!
