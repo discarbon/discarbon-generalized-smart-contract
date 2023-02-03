@@ -27,17 +27,15 @@ node_exit_code=$?
 
 sleep 2
 
-echo "Running in ci: $CI"
 if [[ $CI == "true" ]]; then
-    TERMINAL=/dev/null  # /dev/tty not available in github actins/docker
+    test_output=`npx hardhat test --network localhost $TEST_EXTRA_ARGS 2>&1`
+    test_exit_code=$?
+    echo -e "$test_output"
 else
-    TERMINAL=/dev/tty
+    test_output=`npx hardhat test --network localhost $TEST_EXTRA_ARGS 2>&1 | tee /dev/tty`
+    test_exit_code=$?
 fi
 
-test_output=`npx hardhat test --network localhost $TEST_EXTRA_ARGS 2>&1 | tee $TERMINAL`
-test_exit_code=$?
-
-kill $!
 kill $node_pid
 
 if echo "$test_output" | grep -q "Uncaught error outside test suite"; then 
