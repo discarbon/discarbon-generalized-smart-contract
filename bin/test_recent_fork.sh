@@ -21,7 +21,7 @@ LATEST_BLOCK_NUMBER=`curl -s $POLYGON_RPC_URL -X \
 FORK_BLOCK_NUMBER=$(($LATEST_BLOCK_NUMBER - 0x40))
 
 echo -e "\nForking from block $FORK_BLOCK_NUMBER...\n"
-npx hardhat node --fork $POLYGON_RPC_URL --fork-block-number $FORK_BLOCK_NUMBER > /dev/null & 
+npx hardhat node --fork $POLYGON_RPC_URL --fork-block-number $NO_SUCH_ENV_VAR > /dev/null & 
 node_pid=$!
 node_exit_code=$?
 
