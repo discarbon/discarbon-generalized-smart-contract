@@ -1,13 +1,9 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Node.js CI
+name: hardhat test
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: [push, fork]
 
 jobs:
   build:
@@ -16,15 +12,32 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [16.x, 18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     environment: hardhat tests
     steps:
     - uses: actions/checkout@v3
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm install
-    - run: npx hardhat test
+
+    - name: Install command-line deps
+      run: sudo apt install jq
+
+    - name: Install hardhat/node packages
+      run: npm install
+
+    - name: Create dotenv file
+      run: cp .github/workflows/env_github_actions .env
+
+    - name: Compile contracts
+      run: npx hardhat compile
+
+    - name: Run tests using the fork specified by hardhat.config.js
+      run: npx hardhat test
+
+    - name: Run tests on a fork from a very recent block
+      run: ./bin/test_recent_fork.sh
