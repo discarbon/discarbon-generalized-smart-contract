@@ -18,7 +18,8 @@ LATEST_BLOCK_NUMBER=`curl -s $POLYGON_RPC_URL -X \
     POST -H "Content-Type: application/json" \
     --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' \
     | jq  -r .result`;
-FORK_BLOCK_NUMBER=$(($LATEST_BLOCK_NUMBER - 0xFFF))
+# Polygon mainnet block time is 2 seconds, use a block from an hour ago.
+FORK_BLOCK_NUMBER=$(($LATEST_BLOCK_NUMBER - 1800))
 
 echo -e "\nForking from block $FORK_BLOCK_NUMBER...\n"
 npx hardhat node --fork $POLYGON_RPC_URL --fork-block-number $FORK_BLOCK_NUMBER > /dev/null & 
