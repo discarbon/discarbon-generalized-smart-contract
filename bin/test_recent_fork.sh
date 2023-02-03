@@ -22,11 +22,10 @@ LATEST_BLOCK_NUMBER=`curl -s $POLYGON_RPC_URL -X \
 FORK_BLOCK_NUMBER=$(($LATEST_BLOCK_NUMBER - 1800))
 
 echo -e "\nForking from block $FORK_BLOCK_NUMBER...\n"
-npx hardhat node --fork $POLYGON_RPC_URL --fork-block-number $FORK_BLOCK_NUMBER > /dev/null & 
+npx hardhat node --fork $POLYGON_RPC_URL --fork-block-number $FORK_BLOCK_NUMBER > /dev/null &
 node_pid=$!
-node_exit_code=$?
 
-sleep 2
+sleep 3
 
 if [[ $CI == "true" ]]; then
     echo "Running tests...."
@@ -38,7 +37,7 @@ else
     test_exit_code=$?
 fi
 
-kill $node_pid
+kill -9 $node_pid
 
 if echo "$test_output" | grep -q "Uncaught error outside test suite"; then 
     echo -e "\n\nUncaught error outside test suite - problem running 'hardhat node'?"; 
