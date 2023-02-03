@@ -3,7 +3,7 @@
 
 name: hardhat test
 
-on: [push, pull_request]
+on: [push, fork]
 
 jobs:
   build:
@@ -39,18 +39,5 @@ jobs:
     - name: Run tests using the fork specified by hardhat.config.js
       run: npx hardhat test
 
-    - name: Get the latest block on Polygon mainnet and specify RPC as env var
-      run: |
-        echo RPC_URL=https://polygon-rpc.com >> $GITHUB_ENV 
-        echo LATEST_BLOCK_NUMBER=`curl https://polygon-rpc.com -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' | jq  -r .result` >> $GITHUB_ENV        
-
-    - name: Set the block number to fork from
-      # Use a slightly older block with 64 confirmations
-      run: echo RECENT_BLOCK_NUMBER=$(($LATEST_BLOCK_NUMBER - 0x40)) >> $GITHUB_ENV
-
     - name: Run tests on a fork from a very recent block
-      run: |
-        echo "Forking from block number ${RECENT_BLOCK_NUMBER}"
-        npx hardhat node --fork $RPC_URL --fork-block-number $RECENT_BLOCK_NUMBER > /dev/null &
-        sleep 2
-        npx hardhat test --network localhost
+      run: ./bin/test_recent_fork.sh
