@@ -28,7 +28,7 @@ node_exit_code=$?
 sleep 2
 
 if [[ $CI == "true" ]]; then
-    test_output=`npx hardhat test --network localhost $TEST_EXTRA_ARGS 2>&1`
+    test_output=`npx hardhat test --network localhost 2>&1`
     test_exit_code=$?
     echo -e "$test_output"
 else
